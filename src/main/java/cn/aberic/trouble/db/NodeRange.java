@@ -28,17 +28,16 @@ import cn.aberic.trouble.db.block.TroubleBlock;
 import cn.aberic.trouble.db.file.Stroage;
 
 import java.io.Serializable;
-import java.util.Objects;
 
 /**
- * 结点间范围对象
+ * 结点范围对象
  *
  * @author Aberic on 2018/10/7 15:15
  * @version 1.0
  * @see Node
  * @since 1.0
  */
-public class NodeRange<K, V extends TroubleBlock> implements Range<K, V>, Serializable {
+class NodeRange<K, V extends TroubleBlock> implements Range<K, V>, Serializable {
 
     private static final long serialVersionUID = 1026284682140028531L;
 
@@ -57,8 +56,48 @@ public class NodeRange<K, V extends TroubleBlock> implements Range<K, V>, Serial
     /** 当前结点范围的子对象数组，不可扩容 */
     private NodeRange[] children;
 
+    private static final int DEFAULT_TREE_RANGE_LENGTH = 8;
+
     /**
-     * 结点间范围对象构造
+     * 根据默认范围对象中的所属子结点数组大小进行构造，构造结果为顶级/虚结点范围对象
+     *
+     * <p>默认大小{@link #DEFAULT_TREE_RANGE_LENGTH}
+     */
+    public NodeRange() {
+        this(DEFAULT_TREE_RANGE_LENGTH);
+    }
+
+    /**
+     * 指定范围对象中的所属子结点数组大小进行构造，构造结果为顶级/虚结点范围对象
+     *
+     * <p>顶级/虚结点范围对象为所有结点范围对象的祖宗，它没有任何实际数据可操作意义，
+     * 它的存在就是为了方便构造，但当第一个参数被put的时候，就会将结点的各个范围进行切割，
+     * 直到切割数量达到({@code NodeRange#length} + 1)，即满足分裂条件。
+     * 当满足分裂条件后，{@code NodeRange}开始诞生一个子结点范围数组对象，并继续按照上述条件进行后续分割操作。
+     *
+     * <p>持续分割会维持一个B+Tree的模型。
+     *
+     * @param length 范围对象中的所属子结点数组大小
+     */
+    public NodeRange(int length) {
+        this.length = length;
+        init(length, 0, -1, null);
+    }
+
+    /**
+     * 内部使用结点间范围对象构造
+     *
+     * @param length    范围对象中的所属结点数组大小
+     * @param start     结点所属范围起始位置，初始默认0
+     * @param end       结点所属范围起始位置，初始默认无穷大
+     * @param nodeRange 当前结点范围对象的父对象，仅根可为null
+     */
+    NodeRange(int length, int start, int end, NodeRange nodeRange) {
+        init(length, start, end, nodeRange);
+    }
+
+    /**
+     * 结点间范围对象初始化
      *
      * @param length    范围对象中的所属结点数组大小
      * @param start     结点所属范围起始位置，初始默认0
@@ -66,7 +105,7 @@ public class NodeRange<K, V extends TroubleBlock> implements Range<K, V>, Serial
      * @param nodeRange 当前结点范围对象的父对象，仅根可为null
      */
     @SuppressWarnings("unchecked")
-    public NodeRange(int length, int start, int end, NodeRange nodeRange) {
+    void init(int length, int start, int end, NodeRange nodeRange) {
         this.length = length;
         this.start = start;
         this.end = end;
@@ -78,11 +117,14 @@ public class NodeRange<K, V extends TroubleBlock> implements Range<K, V>, Serial
         children = new NodeRange[length + 1];
     }
 
-    public void setStart(int start) {
+    void setStart(int start) {
+        if (parent == null) {
+            throw new RuntimeException();
+        }
         this.start = start;
     }
 
-    public void setEnd(int end) {
+    void setEnd(int end) {
         this.end = end;
     }
 
@@ -93,7 +135,7 @@ public class NodeRange<K, V extends TroubleBlock> implements Range<K, V>, Serial
      *
      * @return 与否
      */
-    public boolean inRange(int key) {
+    boolean inRange(int key) {
         return key >= start && key < end;
     }
 
@@ -124,6 +166,11 @@ public class NodeRange<K, V extends TroubleBlock> implements Range<K, V>, Serial
 
     final NodeValue putVal(int hash, K key, V value) {
         // TODO: 2018/10/7
+        if (null == parent) { // 自身为顶级NodeRange
+
+        } else { // 正常存储直到最底层指定顺序位
+
+        }
         return null;
     }
 
@@ -142,6 +189,14 @@ public class NodeRange<K, V extends TroubleBlock> implements Range<K, V>, Serial
         return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
     }
 
+    /**
+     * 结点对象
+     *
+     * @author Aberic on 2018/10/7 15:25
+     * @version 1.0
+     * @see NodeValue
+     * @since 1.0
+     */
     static class Node<K, V extends TroubleBlock> {
 
         /** 存储key */
@@ -159,10 +214,6 @@ public class NodeRange<K, V extends TroubleBlock> implements Range<K, V>, Serial
         public final K getKey() { return key; }
 
         public final V getValue() { return Stroage.get(nodeValue.getNum(), nodeValue.getLine()); }
-
-        public final int hashCode() {
-            return Objects.hashCode(key) ^ Objects.hashCode(nodeValue);
-        }
 
         public final boolean saveValue(V v) {
             try {
