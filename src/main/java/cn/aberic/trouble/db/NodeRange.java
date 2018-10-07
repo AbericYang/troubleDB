@@ -25,12 +25,10 @@
 package cn.aberic.trouble.db;
 
 import cn.aberic.trouble.db.block.TroubleBlock;
+import cn.aberic.trouble.db.file.Stroage;
 
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.Objects;
 
 /**
  * 结点间范围对象
@@ -40,7 +38,7 @@ import java.util.Set;
  * @see Node
  * @since 1.0
  */
-public class NodeRange<K, V extends TroubleBlock> implements Map<K, V>, Serializable {
+public class NodeRange<K, V extends TroubleBlock> implements Range<K, V>, Serializable {
 
     private static final long serialVersionUID = 1026284682140028531L;
 
@@ -51,7 +49,7 @@ public class NodeRange<K, V extends TroubleBlock> implements Map<K, V>, Serializ
     /** 结点所属范围起始位置，默认无穷大 */
     private int end = -1;
     /** 结点数组，不可扩容 */
-    private Node<K>[] nodes;
+    private Node<K, V>[] nodes;
     /** 当前范围下的结点总数 */
     private int size;
     /** 当前结点范围的父对象，仅根可为null */
@@ -75,7 +73,7 @@ public class NodeRange<K, V extends TroubleBlock> implements Map<K, V>, Serializ
         this.size = 0;
         parent = nodeRange;
         // 结点数组根据设定执行初始化
-        nodes = (Node<K>[]) new Node[length];
+        nodes = (Node<K, V>[]) new Node[length];
         // 子range集合的数量必为结点集合的大小+1
         children = new NodeRange[length + 1];
     }
@@ -115,27 +113,22 @@ public class NodeRange<K, V extends TroubleBlock> implements Map<K, V>, Serializ
     }
 
     @Override
-    public boolean containsValue(Object value) {
-        return false;
-    }
-
-    @Override
     public V get(Object key) {
         return null;
     }
 
     @Override
-    public V put(K key, V value) {
+    public NodeValue put(K key, V value) {
+        return putVal(hash(key), key, value);
+    }
+
+    final NodeValue putVal(int hash, K key, V value) {
+        // TODO: 2018/10/7
         return null;
     }
 
     @Override
-    public V remove(Object key) {
-        return null;
-    }
-
-    @Override
-    public void putAll(Map<? extends K, ? extends V> m) {
+    public void putAll(Range<? extends K, ? extends V> m) {
 
     }
 
@@ -144,24 +137,42 @@ public class NodeRange<K, V extends TroubleBlock> implements Map<K, V>, Serializ
 
     }
 
-    @Override
-    public Set<K> keySet() {
-        return null;
-    }
-
-    @Override
-    public Collection<V> values() {
-        return null;
-    }
-
-    @Override
-    public Set<Entry<K, V>> entrySet() {
-        return null;
-    }
-
     static final int hash(Object key) {
         int h;
         return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
+    }
+
+    static class Node<K, V extends TroubleBlock> {
+
+        /** 存储key */
+        final int hash;
+        /** 传入key */
+        final K key;
+        /** 存储Value */
+        NodeValue nodeValue;
+
+        Node(int hash, K key) {
+            this.hash = hash;
+            this.key = key;
+        }
+
+        public final K getKey() { return key; }
+
+        public final V getValue() { return Stroage.get(nodeValue.getNum(), nodeValue.getLine()); }
+
+        public final int hashCode() {
+            return Objects.hashCode(key) ^ Objects.hashCode(nodeValue);
+        }
+
+        public final boolean saveValue(V v) {
+            try {
+                nodeValue = Stroage.save(v);
+                return true;
+            } catch (Exception e) {
+                return false;
+            }
+        }
+
     }
 
 }

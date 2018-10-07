@@ -24,37 +24,25 @@
 
 package cn.aberic.trouble.db;
 
-import com.alibaba.fastjson.annotation.JSONField;
-
 /**
- * 结点值对象
- * <p>
- * 结点{@link cn.aberic.trouble.db.NodeRange.Node}的值对象，保存其所指引的具体内容所在文件及所在文件中的位置
- *
- * @author Aberic on 2018/10/7 22:05
- * @see cn.aberic.trouble.db.NodeRange.Node
+ * @author Aberic on 2018/10/7 22:36
  * @see NodeRange
  * @since 1.0
  */
-public class NodeValue {
+public interface Range<K, V> {
 
-    /** 区块所在区块文件编号 */
-    @JSONField(name = "n")
-    private int num;
-    /** 区块所在区块文件中的行号 */
-    @JSONField(name = "l")
-    private int line;
+    int size();
 
-    public NodeValue(int num, int line) {
-        this.num = num;
-        this.line = line;
-    }
+    boolean isEmpty();
 
-    public int getNum() {
-        return num;
-    }
+    boolean containsKey(Object key);
 
-    public int getLine() {
-        return line;
-    }
+    V get(Object key);
+
+    NodeValue put(K key, V value);
+
+    void putAll(Range<? extends K, ? extends V> m);
+
+    void clear();
+
 }

@@ -22,22 +22,24 @@
  * SOFTWARE.
  */
 
-package cn.aberic.trouble.db;
+package cn.aberic.trouble.db.file;
+
+import cn.aberic.trouble.db.NodeValue;
+import cn.aberic.trouble.db.block.TroubleBlock;
 
 /**
- * 默认结点的值对象
- *
- * @author Aberic on 2018/10/7 15:24
- * @see Node
+ * @author Aberic on 2018/10/7 23:01
+ * @see ClassLoader#defineClass(byte[], int, int)
  * @since 1.0
  */
-class Value {
+public class Stroage {
 
-    /** 交易hash */
-    String txHash;
-    /** 区块高度 */
-    int height;
-    /** 区块hash */
-    String blockHash;
+    public static <T extends TroubleBlock> NodeValue save(T t) throws Exception{
+        throw new Exception();
+    }
+
+    public static <T extends TroubleBlock> T get(int num, int line) {
+        return null;
+    }
 
 }
