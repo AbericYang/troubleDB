@@ -37,8 +37,7 @@ public abstract class AbstractTMap<K, V> implements TMap<K, V> {
     /**
      * 唯一的构造方法。（由子类构造方法调用，通常是隐式的。）
      */
-    protected AbstractTMap() {
-    }
+    AbstractTMap() {}
 
     /**
      * {@inheritDoc}
@@ -108,10 +107,16 @@ public abstract class AbstractTMap<K, V> implements TMap<K, V> {
     }
 
     /**
-     * {@inheritDoc}
+     * 返回此映射中包含的映射关系的{@link AbstractTMap.Range}视图。
+     * 该Range受映射支持，所以对映射的更改可在此Range中反映出来，反之亦然。
      *
-     * @return {@inheritDoc}
+     * @return 此映射中包含的映射关系的Range视图
      */
     public abstract Range<K, V> range();
+
+    static final int hash(Object key) {
+        int h;
+        return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
+    }
 
 }

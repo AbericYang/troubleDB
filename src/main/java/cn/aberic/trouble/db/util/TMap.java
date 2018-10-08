@@ -111,14 +111,6 @@ public interface TMap<K, V> {
 //    void putAll(RangeMap<? extends K, ? extends V> m);
 
     /**
-     * 返回此映射中包含的映射关系的{@link AbstractTMap.Range}视图。
-     * 该Range受映射支持，所以对映射的更改可在此Range中反映出来，反之亦然。
-     *
-     * @return 此映射中包含的映射关系的Range视图
-     */
-    Range<K, V> range();
-
-    /**
      * B-tree的层对象。
      *
      * <p>B-tree中每一个层对象{@code Range}都包含至少一个映射项{@link RangePair}或{@link BlockPair}，

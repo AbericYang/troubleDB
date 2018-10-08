@@ -28,21 +28,24 @@ import java.io.Serializable;
 
 /**
  * 基于哈希表的 <tt>TMap</tt> 的接口实现。此实现提供所有可选的映射操作，并允许使用 <tt>null</tt> 值和 <tt>null</tt> 键，但不推荐。
- * （除了此类的 <tt>key</tt> 被存入内存，<tt>RangeTreeMap</tt> 类与<tt>BlockTreeMap</tt> 大致相同。）
+ * （除了此类的 <tt>key</tt> 被存入内存，<tt>HashRangeMap</tt> 类与<tt>HashBlockMap</tt> 大致相同。）
  *
  * <p>理论上此类不保证映射的顺序，特别是它不保证该顺序恒久不变。
- * 实际实现中，此类在做映射操作的时候，会将传入 <tt>key</tt> 的 <tt>hash</tt> 按照从小到大的顺序做一个类双向链表的方式排列，
+ * 实际实现中，此类在做映射操作的时候，会将传入 <tt>key</tt> 的 <tt>hash</tt> 在 <tt>RangeTreeMap</tt> 中按照从小到大的顺序做一个类双向链表的方式排列，
  * 可以非常快速的找到第一个和最后一个结点，同时可以根据第一个和最后一个结点进行有序迭代。
  * 注意：这个有序取决于 <tt>key</tt> 的 <tt>hash</tt> 值。
- * 因此，如果自定义 <tt>key</tt> ，并且 <tt>key</tt> 是一个从1开始一直到{@link Integer#MAX_VALUE}，中间允许有间断，
- * 那么 <tt>RangeTreeMap</tt> 在这种情况下，可以被看做是一个有序表。
- * 并且从1开始进行有序的不间断的传入将会使<tt>RangeTreeMap</tt> 类与<tt>BlockTreeMap</tt> 类效率达到最高。
+ * 因此，如果自定义 <tt>key</tt> ，并且 <tt>key</tt> 是 <tt>Integer/int</tt> 类型，且一个从1开始一直到{@link Integer#MAX_VALUE}，中间允许有间断，
+ * 那么 <tt>HashRangeMap</tt> 在这种情况下，可以被看做是一个有序表。
+ * 并且从1开始进行有序的不间断的传入将会使<tt>HashIntegerMap</tt> 类效率达到最高。
  *
  * <p>哈希表的存储横向数组中，每一列都会维持一个B-Tree，由{@link RangeTreeMap}实现。
  *
  * @author Aberic on 2018/10/08 17:13
  * @version 1.0
+ * @see TMap
  * @see RangeTreeMap
+ * @see HashBlockMap
+ * @see HashIntegerMap
  * @since 1.0
  */
 public class HashRangeMap<K, V> implements TMap<K, V>, Serializable {
@@ -63,11 +66,11 @@ public class HashRangeMap<K, V> implements TMap<K, V>, Serializable {
      * 则该值将会在无参构造的时候被赋值为{@link #DEFAULT_TREE_RANGE_LENGTH}
      */
     private int rangeLength;
-    private int[] ks;
+    /** 有序存储于哈希表中的B-tree */
     private RangeTreeMap<K, V>[] treeMaps;
 
     public HashRangeMap() {
-        this(DEFAULT_HASH_LENGTH, DEFAULT_TREE_RANGE_LENGTH);
+        this(DEFAULT_HASH_LENGTH);
     }
 
     public HashRangeMap(int hashLength) {
@@ -87,8 +90,20 @@ public class HashRangeMap<K, V> implements TMap<K, V>, Serializable {
             this.rangeLength = rangeLength;
         }
         treeMaps = new RangeTreeMap[hashLength];
-        ks = new int[hashLength];
+        for (int i = 0; i < hashLength; i++) {
+            RangeTreeMap treeMap = new RangeTreeMap(rangeLength);
+            treeMaps[i] = treeMap;
+        }
         size = 0;
+    }
+
+    /**
+     * 构造顶级结点范围对象的所属子结点数组大小
+     *
+     * @return 构造顶级结点范围对象的所属子结点数组大小
+     */
+    public int getRangeLength() {
+        return rangeLength;
     }
 
     @Override
@@ -103,29 +118,19 @@ public class HashRangeMap<K, V> implements TMap<K, V>, Serializable {
 
     @Override
     public boolean containsKey(Object key) {
-        return treeMaps[hash(key) % hashLength].containsKey(key);
+        return treeMaps[RangeTreeMap.hash(key) % hashLength].containsKey(key);
     }
 
     @Override
     public V get(Object key) {
-        return treeMaps[hash(key) % hashLength].get(key);
+        return treeMaps[RangeTreeMap.hash(key) % hashLength].get(key);
     }
 
     @Override
     public V put(K key, V value) {
-        V v = treeMaps[hash(key) % hashLength].put(key, value);
+        V v = treeMaps[RangeTreeMap.hash(key) % hashLength].put(key, value);
         size++;
         return v;
-    }
-
-    @Override
-    public Range<K, V> range() {
-        return null;
-    }
-
-    static final int hash(Object key) {
-        int h;
-        return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
     }
 
 }
