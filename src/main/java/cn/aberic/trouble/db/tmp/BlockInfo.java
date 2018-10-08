@@ -34,6 +34,8 @@ import java.util.List;
  * 作者：Aberic on 2018/08/27 17:29
  * <p>
  * 邮箱：abericyang@gmail.com
+ *
+ * {@inheritDoc} 生成javadoc时，继承的时候，直接把父类的注解都copy下来
  */
 public class BlockInfo {
 

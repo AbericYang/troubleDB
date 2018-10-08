@@ -24,8 +24,8 @@
 
 package cn.aberic.trouble.db.file;
 
-import cn.aberic.trouble.db.NodeValue;
 import cn.aberic.trouble.db.block.TroubleBlock;
+import cn.aberic.trouble.db.util.HashBlockMap;
 
 /**
  * @author Aberic on 2018/10/7 23:01
@@ -34,7 +34,7 @@ import cn.aberic.trouble.db.block.TroubleBlock;
  */
 public class Stroage {
 
-    public static <T extends TroubleBlock> NodeValue save(T t) throws Exception{
+    public static <T extends TroubleBlock> HashBlockMap.NodeValue save(T t) throws Exception{
         throw new Exception();
     }
 
