@@ -25,11 +25,11 @@
 package cn.aberic.trouble.db.util;
 
 /**
- * 此类提供{@link RangeMap}接口的骨干实现，以最大限度地减少实现此接口所需的工作。
+ * 此类提供{@link TMap}接口的骨干实现，以最大限度地减少实现此接口所需的工作。
  *
  * @author Aberic on 2018/10/08 09:50
  * @version 1.0
- * @see HashRangeMap
+ * @see RangeTreeMap
  * @since 1.0
  */
 public abstract class AbstractTMap<K, V> implements TMap<K, V> {

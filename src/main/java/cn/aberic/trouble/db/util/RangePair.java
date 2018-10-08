@@ -26,11 +26,11 @@ package cn.aberic.trouble.db.util;
 
 /**
  * 映射项（键-值对）。
- * <tt>RangeMap.range</tt> 方法返回属于此类元素的映射视图。
+ * <tt>RangeTreeMap.range</tt> 方法返回属于此类元素的映射视图。
  *
- * @see RangeMap#range()
- * @see HashRangeMap
- * @see HashRangeMap.Node
+ * @see RangeTreeMap#range()
+ * @see RangeTreeMap
+ * @see RangeTreeMap.Node
  * @since 1.0
  */
 public interface RangePair<K, V> {
