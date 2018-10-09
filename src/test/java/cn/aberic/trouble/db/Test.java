@@ -24,6 +24,8 @@
 
 package cn.aberic.trouble.db;
 
+import cn.aberic.trouble.db.util.IntegerTreeMap;
+
 /**
  * @author Aberic on 2018/10/8 19:20
  * @see ClassLoader#defineClass(byte[], int, int)
@@ -76,6 +78,15 @@ public class Test {
         String hash = getIntHash(hashInt);
         System.out.println(hashInt + " | " + Integer.toHexString(hashInt) + " | hash = " + hash + "| int = " + parseToInt(hash));
 
+        System.out.println("94 / 3 = " + 94 / 3);
+        System.out.println("95 / 3 = " + 95 / 3);
+
+        System.out.println("Math.pow(2,1) = " + (int) Math.pow(2, 1));
+        System.out.println("Math.pow(2,2) = " + (int) Math.pow(2, 2));
+        System.out.println("Math.pow(2,3) = " + (int) Math.pow(2, 3));
+        System.out.println("Math.pow(2,4) = " + (int) Math.pow(2, 4));
+
+        // IntegerTreeMap.NodeRange.initLevelErevyRange();
     }
 
     /**

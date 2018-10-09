@@ -133,31 +133,6 @@ public interface TMap<K, V> {
         int size();
 
         /**
-         * 设置Range的起点，默认为0
-         *
-         * @param start Range的起点
-         */
-        void setStart(int start);
-
-        /**
-         * 设置Range的终点，默认为-1，即无穷大
-         *
-         * @param end Range的终点
-         */
-        void setEnd(int end);
-
-        /**
-         * 如果key在此结点范围内，则返回 <tt>true</tt> 。
-         * 参考{@code #setStart(int)}中的int值 <tt>start</tt> 和{@code #setEnd(int)}中的int值 <tt>end</tt>
-         * 即 <tt>(key >= start && key < end)</tt> 则为 <tt>true</tt> 。
-         *
-         * @param key 要测试此Range是否包含该元素的key
-         * @return 如果key在此结点范围内，则返回 <tt>true</tt>
-         * @throws IndexOutOfBoundsException 当传入值小于0时（可选）
-         */
-        boolean inRange(int key);
-
-        /**
          * 如果Range包含指定的元素，则返回 true。
          * 更确切地讲，当且仅当Range包含满足 <tt>(key==null ? e==null : key.equals(e))</tt> 的元素 <tt>e</tt> 时返回 <tt>true</tt> 。
          *
