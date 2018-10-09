@@ -25,6 +25,17 @@
 package cn.aberic.trouble.db.util;
 
 /**
+ * n <====> tree level 0+
+ * m <====> tree now level 0+
+ * x <====> node count 1+
+ * y <====> tree degree 0+ <====> x + 1
+ * b <====> now degree 0+
+ * z <====> now node index 0+
+ * v <====> last Range now degree 0+
+ *
+ * (1 + z)(y^(m - 1)) + (yv + b - 1)(y^m)
+ *
+ *
  * @author Aberic on 2018/10/8 22:07
  * @see ClassLoader#defineClass(byte[], int, int)
  * @since 1.0
