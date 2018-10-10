@@ -73,7 +73,7 @@ public abstract class AbstractTMap<K, V> implements TMap<K, V> {
      * 2、如果是区块内容查询，则值被映射到本地磁盘中，则比{@code #get(Object)}方法所花费的时间要更短。
      */
     @Override
-    public boolean containsKey(Object key) { return range().contains(key); }
+    public boolean containsKey(K key) { return range().contains(key); }
 
     /**
      * {@inheritDoc}
@@ -89,7 +89,7 @@ public abstract class AbstractTMap<K, V> implements TMap<K, V> {
      * 2、如果是区块内容查询，则值被映射到本地磁盘中，则比{@code #containsKey(Object)}方法所花费的时间要更长。
      */
     @Override
-    public V get(Object key) {
+    public V get(K key) {
         return range().get(key);
     }
 

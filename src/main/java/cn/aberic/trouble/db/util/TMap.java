@@ -61,7 +61,7 @@ public interface TMap<K, V> {
      * @throws ClassCastException   如果该键对于此映射是不合适的类型（可选）
      * @throws NullPointerException 如果指定键为 null 并且此映射不允许 null 键（可选）
      */
-    boolean containsKey(Object key);
+    boolean containsKey(K key);
 
     /**
      * 返回指定键所映射的值；如果此映射不包含该键的映射关系，则返回{@code null}。
@@ -77,7 +77,7 @@ public interface TMap<K, V> {
      * @throws ClassCastException   如果该键对于此映射是不合适的类型（可选）
      * @throws NullPointerException 如果指定键为 null 并且此映射不允许 null 键（可选）
      */
-    V get(Object key);
+    V get(K key);
 
     /**
      * 将指定的值与此映射中的指定键关联（可选操作）。
@@ -141,7 +141,7 @@ public interface TMap<K, V> {
          * @throws ClassCastException   如果指定元素的类型与此Range不兼容（可选）
          * @throws NullPointerException 如果指定的元素为null并且此Range不允许null元素（可选）
          */
-        boolean contains(Object key);
+        boolean contains(K key);
 
         /**
          * 返回指定键所映射的值；如果此映射不包含该键的映射关系，则返回{@code null}。
@@ -157,7 +157,7 @@ public interface TMap<K, V> {
          * @throws ClassCastException   如果该键对于此映射是不合适的类型（可选）
          * @throws NullPointerException 如果指定键为 null 并且此映射不允许 null 键（可选）
          */
-        V get(Object key);
+        V get(K key);
 
         /**
          * 将指定的值与此映射中的指定键关联（可选操作）。
