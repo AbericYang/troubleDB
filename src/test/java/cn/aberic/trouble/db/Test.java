@@ -26,6 +26,8 @@ package cn.aberic.trouble.db;
 
 import cn.aberic.trouble.db.util.IntegerTreeMap;
 
+import java.util.HashMap;
+
 /**
  * @author Aberic on 2018/10/8 19:20
  * @see ClassLoader#defineClass(byte[], int, int)
@@ -74,26 +76,84 @@ public class Test {
 //        System.out.println("x = " + x + "| y = " + y + "| x + y = " + (x + y));
 //        System.out.println(Integer.toHexString(x) + " | hash = " + getIntHash(x));
 //        System.out.println(Integer.toHexString(y) + " | hash = " + getIntHash(y));
-        int hashInt = Integer.MAX_VALUE;
-        String hash = getIntHash(hashInt);
-        System.out.println(hashInt + " | " + Integer.toHexString(hashInt) + " | hash = " + hash + "| int = " + parseToInt(hash));
 
-        System.out.println("94 / 3 = " + 94 / 3);
-        System.out.println("95 / 3 = " + 95 / 3);
-
-        System.out.println("Math.pow(2,1) = " + (int) Math.pow(2, 1));
-        System.out.println("Math.pow(2,2) = " + (int) Math.pow(2, 2));
-        System.out.println("Math.pow(2,3) = " + (int) Math.pow(2, 3));
-        System.out.println("Math.pow(2,4) = " + (int) Math.pow(2, 4));
+//        int hashInt = Integer.MAX_VALUE;
+//        String hash = getIntHash(hashInt);
+//        System.out.println(hashInt + " | " + Integer.toHexString(hashInt) + " | hash = " + hash + "| int = " + parseToInt(hash));
+//
+//        System.out.println("94 / 3 = " + 94 / 3);
+//        System.out.println("95 / 3 = " + 95 / 3);
+//
+//        System.out.println("Math.pow(2,1) = " + (int) Math.pow(2, 1));
+//        System.out.println("Math.pow(2,2) = " + (int) Math.pow(2, 2));
+//        System.out.println("Math.pow(2,3) = " + (int) Math.pow(2, 3));
+//        System.out.println("Math.pow(2,4) = " + (int) Math.pow(2, 4));
 
         // IntegerTreeMap.NodeRange.initLevelErevyRange();
+
+// ====================================================================================================================================
+//        HashMap<Integer, Integer> hashMap = new HashMap<>();
+//
+//        long startTime = System.currentTimeMillis();
+//        for (int i = 1; i <= 1000000; i++) {
+//            hashMap.put(i, i);
+//        }
+//        long estimatedTime = System.currentTimeMillis() - startTime;
+//        System.out.println("HashMap put 耗时 = " + estimatedTime);
+//
+//        startTime = System.currentTimeMillis();
+//        for (int i = 1; i <= 1000000; i++) {
+//            // System.out.println("map.get(" + i + ") = " + map.get(i));
+//            hashMap.get(i);
+//        }
+//        estimatedTime = System.currentTimeMillis() - startTime;
+//        System.out.println("HashMap get 耗时 = " + estimatedTime);
+//
+//        System.out.println("=============================================================");
+//
+//        IntegerTreeMap<Integer> map = new IntegerTreeMap<>();
+//
+//        startTime = System.currentTimeMillis();
+//        for (int i = 1; i <= 1000000; i++) {
+//            map.put(i, i);
+//        }
+//        estimatedTime = System.currentTimeMillis() - startTime;
+//        System.out.println("IntegerTreeMap put 耗时 = " + estimatedTime);
+//
+//        startTime = System.currentTimeMillis();
+//        for (int i = 1; i <= 1000000; i++) {
+//            // System.out.println("map.get(" + i + ") = " + map.get(i));
+//            map.get(i);
+//        }
+//        estimatedTime = System.currentTimeMillis() - startTime;
+//        System.out.println("IntegerTreeMap get 耗时 = " + estimatedTime);
+// ====================================================================================================================================
+
+        IntegerTreeMap<Integer> map = new IntegerTreeMap<>();
+        map.put(2000, 158);
+//        map.put(157, "b");
+//        map.put(158, "c");
+//        map.put(159, "d");
+//        map.put(160, "e");
+//
+//        System.out.println();
+//        System.out.println("map.get(148) = " + map.get(148));
+//        System.out.println("map.get(157) = " + map.get(157));
+//        System.out.println("map.get(158) = " + map.get(158));
+//        System.out.println("map.get(159) = " + map.get(159));
+//        System.out.println("map.get(160) = " + map.get(160));
+
+//        System.out.println("1 / 4 = " + 1 / 4);
+//        System.out.println("3 / 4 = " + 3 / 4);
+//        System.out.println("5 / 4 = " + 5 / 4);
+//        System.out.println("7 / 4 = " + 7 / 4);
+//        System.out.println("9 / 4 = " + 9 / 4);
     }
 
     /**
      * 补位符 - z -zi
      *
      * @param i
-     *
      * @return
      */
     private static String getIntHash(int i) {
@@ -157,7 +217,6 @@ public class Test {
      * ---------------------------------------------------------------
      *
      * @param str
-     *
      * @return
      */
     private static String encode(String str) {

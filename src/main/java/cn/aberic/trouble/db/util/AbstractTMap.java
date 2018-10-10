@@ -29,7 +29,7 @@ package cn.aberic.trouble.db.util;
  *
  * @author Aberic on 2018/10/08 09:50
  * @version 1.0
- * @see RangeTreeMap
+ * @see IntegerTreeMap
  * @since 1.0
  */
 public abstract class AbstractTMap<K, V> implements TMap<K, V> {
