@@ -24,6 +24,7 @@
 
 package cn.aberic.trouble.db;
 
+import cn.aberic.trouble.db.util.HashIntegerMap;
 import cn.aberic.trouble.db.util.IntegerTreeMap;
 
 import java.util.HashMap;
@@ -93,14 +94,14 @@ public class Test {
         HashMap<Integer, Integer> hashMap = new HashMap<>();
 
         long startTime = System.currentTimeMillis();
-        for (int i = 1; i <= 1000000; i++) {
+        for (int i = 1; i <= 10000000; i++) {
             hashMap.put(i, i);
         }
         long estimatedTime = System.currentTimeMillis() - startTime;
         System.out.println("HashMap put 耗时 = " + estimatedTime);
 
         startTime = System.currentTimeMillis();
-        for (int i = 1; i <= 1000000; i++) {
+        for (int i = 1; i <= 10000000; i++) {
             // System.out.println("map.get(" + i + ") = " + map.get(i));
             hashMap.get(i);
         }
@@ -109,17 +110,18 @@ public class Test {
 
         System.out.println("=============================================================");
 
-        IntegerTreeMap<Integer> map = new IntegerTreeMap<>();
+        HashIntegerMap<Integer> map = new HashIntegerMap<>();
+//        IntegerTreeMap<Integer> map = new IntegerTreeMap<>();
 
         startTime = System.currentTimeMillis();
-        for (int i = 1; i <= 1000000; i++) {
+        for (int i = 1; i <= 10000000; i++) {
             map.put(i, i);
         }
         estimatedTime = System.currentTimeMillis() - startTime;
         System.out.println("IntegerTreeMap put 耗时 = " + estimatedTime);
 
         startTime = System.currentTimeMillis();
-        for (int i = 1; i <= 1000000; i++) {
+        for (int i = 1; i <= 10000000; i++) {
             // System.out.println("map.get(" + i + ") = " + map.get(i));
             map.get(i);
         }
@@ -129,12 +131,16 @@ public class Test {
         System.out.println("map.isEmpty() = " + map.isEmpty());
 // ====================================================================================================================================
 
+//        HashIntegerMap<Integer> map = new HashIntegerMap<>();
 //        IntegerTreeMap<Integer> map = new IntegerTreeMap<>();
 //        for (int i = 1; i <= 1030300; i*=3) {
 //            map.put(i, i);
 //        }
 //        for (int i = 1; i <= 1030300; i*=3) {
-//            System.out.println("map.get(" + i + ") = " + map.get(i));
+//            System.out.println("map.get(" + i + ") = " + map.get(i) + " | map.containsKey(" + i + ") = " + map.containsKey(i));
+//        }
+//        for (int i = 1; i <= 1030300; i*=2) {
+//            System.out.println("map.get(" + i + ") = " + map.get(i) + " | map.containsKey(" + i + ") = " + map.containsKey(i));
 //        }
 //        map.put(158, 158);
 //        map.put(157, "b");

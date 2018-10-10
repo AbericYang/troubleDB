@@ -80,10 +80,18 @@ public class IntegerTreeMap<V> extends AbstractTMap<Integer, V> implements TMap<
 
     @Override
     public V get(Integer key) {
+        return super.get(real(key));
+    }
+
+    @Override
+    public boolean containsKey(Integer key) {
+        return super.containsKey(real(key));
+    }
+
+    private int real(Integer key) {
         int m = root.calculateLevelNow(key); // 当前结点范围对象所在B-Tree的层
         int v = root.calculateDegreeForOneLevelNow(key, m); // 当前结点范围对象在整层度中的顺序位置
-        int real = root.calculateReal(key, m, v); // 当前key在B-Tree中的真实数字
-        return super.get(real);
+        return root.calculateReal(key, m, v); // 当前key在B-Tree中的真实数字
     }
 
     /**
@@ -98,13 +106,14 @@ public class IntegerTreeMap<V> extends AbstractTMap<Integer, V> implements TMap<
 
     static class NodeRange<V> implements Range<Integer, V> {
 
+        /** B-Tree的层 - n */
+        private final static int TREE_MAX_LEVEL = 3;
         /** 结点范围对象中的所属子结点数组大小 - x */
 //        private final static int NODE_ARRAY_LENGTH = 3;
         private final static int NODE_ARRAY_LENGTH = 100;
+        final static int TREE_MAX_LENGTH = 1030300;
         /** B-Tree的最大度，即结点范围结点拥有子树的数目 - y */
         private final static int TREE_MAX_DEGREE = NODE_ARRAY_LENGTH + 1;
-        /** B-Tree的层 - n */
-        private final static int TREE_MAX_LEVEL = 3;
         /** key在当前结点内的下标 - z */
         private int keyIndexInNode = 0;
         /** 当前结点范围对象在整层度中的顺序位置 - v */
@@ -121,8 +130,6 @@ public class IntegerTreeMap<V> extends AbstractTMap<Integer, V> implements TMap<
         private int firstNodeNum;
         /** 结点数组，不可扩容 */
         private Node<V>[] nodes;
-        /** 当前范围下的结点总数 */
-        private int size;
         /** 当前结点范围的子对象数组，不可扩容 */
         private NodeRange<V>[] nodeChildrenRanges;
 
@@ -171,7 +178,6 @@ public class IntegerTreeMap<V> extends AbstractTMap<Integer, V> implements TMap<
             this.levelNow = levelNow;
             this.yPowM = (int) Math.pow(TREE_MAX_DEGREE, this.levelNow);
             this.yPowM1 = (int) Math.pow(TREE_MAX_DEGREE, this.levelNow - 1);
-            this.size = 0;
             // B-Tree的最大度/子range集合的数量必为结点集合的大小+1
             nodeChildrenRanges = new NodeRange[TREE_MAX_DEGREE];
             // 结点数组根据设定执行初始化
@@ -183,7 +189,7 @@ public class IntegerTreeMap<V> extends AbstractTMap<Integer, V> implements TMap<
 
         @Override
         public int size() {
-            return size;
+            return 0;
         }
 
         @Override
@@ -253,13 +259,31 @@ public class IntegerTreeMap<V> extends AbstractTMap<Integer, V> implements TMap<
             } else {
                 value = node.setValue(value);
             }
-            size++;
             return value;
         }
 
         @Override
         public boolean contains(Integer key) {
-            return false;
+            return containsByKey(this, key);
+        }
+
+        private boolean containsByKey(NodeRange<V> range, int real) {
+            int gap = real - firstNodeNum;
+            int index;
+            if (gap < 0) { // 为子范围集合中首个
+                index = 0;
+            } else {
+                int yPowM1 = range.yPowM1;
+                index = gap / yPowM1;
+                if (gap % yPowM1 == 0) { // 为子结点集合其中之一
+                    Node<V> node = nodes[index];
+                    return null != node;
+                } else { // 为子范围集合中首个以外的其中之一
+                    index += 1;
+                }
+            }
+            NodeRange<V> rangeNext = range.nodeChildrenRanges[index];
+            return null != rangeNext && rangeNext.containsByKey(rangeNext, real);
         }
 
         /**
