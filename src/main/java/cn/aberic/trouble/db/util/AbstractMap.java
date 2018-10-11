@@ -53,7 +53,7 @@ public abstract class AbstractMap<K, V> implements Map<K, V> {
      * 2、如果是区块内容查询，则值被映射到本地磁盘中，则比{@code #get(Object)}方法所花费的时间要更短。
      */
     @Override
-    public boolean containsKey(int storeHash, K key) { return range().contains(storeHash, key); }
+    public boolean containsKey(int storeHash) { return range().contains(storeHash); }
 
     /**
      * {@inheritDoc}

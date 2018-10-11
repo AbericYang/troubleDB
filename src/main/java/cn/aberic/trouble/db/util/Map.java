@@ -41,12 +41,12 @@ public interface Map<K, V> {
      * 更确切地讲，当且仅当此映射包含针对满足 <tt>(key==null ? k==null : key.equals(k))</tt> 的键 <tt>k</tt> 的映射关系时，返回 true。
      * （最多只能有一个这样的映射关系）。
      *
-     * @param key 测试是否存在于此映射中的键
+     * @param storeHash 测试是否存在于此映射中的键
      * @return 如果此映射包含指定键的映射关系，则返回 <tt>true</tt>
      * @throws ClassCastException   如果该键对于此映射是不合适的类型（可选）
      * @throws NullPointerException 如果指定键为 null 并且此映射不允许 null 键（可选）
      */
-    boolean containsKey(int storeHash, K key);
+    boolean containsKey(int storeHash);
 
     /**
      * 返回指定键所映射的值；如果此映射不包含该键的映射关系，则返回{@code null}。

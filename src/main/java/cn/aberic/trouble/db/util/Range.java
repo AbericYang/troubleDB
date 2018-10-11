@@ -33,10 +33,8 @@ import java.util.LinkedList;
  * <p>B-tree中每一个层对象{@code Range}都包含至少一个映射项{@link Map.RangePair}或{@link BlockPair}，
  * 且两者内的泛型元素保持一致。
  *
- * @see //RangeTreeMap
- * @see //BlockTreeMap
- * @see //RangeTreeMap.NodeRange
- * @see //BlockTreeMap.NodeRange
+ * @see AbstractMap
+ * @see TTreeMap
  * @since 1.0
  */
 abstract class Range<K, V> {
@@ -129,12 +127,12 @@ abstract class Range<K, V> {
      * 如果Range包含指定的元素，则返回 true。
      * 更确切地讲，当且仅当Range包含满足 <tt>(key==null ? e==null : key.equals(e))</tt> 的元素 <tt>e</tt> 时返回 <tt>true</tt> 。
      *
-     * @param key 要测试此Range中是否存在的元素
+     * @param storeHash 要测试此Range中是否存在的元素
      * @return 如果此Range包含指定的元素，则返回<tt>true</tt>
      * @throws ClassCastException   如果指定元素的类型与此Range不兼容（可选）
      * @throws NullPointerException 如果指定的元素为null并且此Range不允许null元素（可选）
      */
-    boolean contains(int storeHash, K key) {
+    boolean contains(int storeHash) {
         return containsByKey(this, real(storeHash));
     }
 

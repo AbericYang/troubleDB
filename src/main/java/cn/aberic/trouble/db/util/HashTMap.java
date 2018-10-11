@@ -32,7 +32,7 @@ import java.util.Arrays;
  * @see ClassLoader#defineClass(byte[], int, int)
  * @since 1.0
  */
-public class HashTMap<K, V> implements TMap<K, V>, Serializable {
+public class HashTMap<K, V> extends AbstractTMap<K, V> implements Serializable {
 
     private static final long serialVersionUID = 2794796425862934413L;
 
@@ -96,15 +96,12 @@ public class HashTMap<K, V> implements TMap<K, V>, Serializable {
      */
     @Override
     public boolean containsKey(K key) {
-        int hash = TTreeMap.hash(key);
-        if (hash < 0) {
-            hash = hash(hash);
-        }
+        int hash = checkHashByKey(key);
         int unit = unit(hash);
         if (unit > hashArrayCheckLength) {
             return false;
         }
-        return treeMaps[unit].containsKey(storeHash(hash, unit), key);
+        return treeMaps[unit].containsKey(storeHash(hash, unit));
     }
 
     /**
@@ -114,10 +111,7 @@ public class HashTMap<K, V> implements TMap<K, V>, Serializable {
      */
     @Override
     public V get(K key) {
-        int hash = TTreeMap.hash(key);
-        if (hash < 0) {
-            hash = hash(hash);
-        }
+        int hash = checkHashByKey(key);
         int unit = unit(hash);
         if (unit > hashArrayCheckLength) {
             return null;
@@ -135,10 +129,7 @@ public class HashTMap<K, V> implements TMap<K, V>, Serializable {
         if (null == key) {
             throw new NullPointerException();
         }
-        int hash = TTreeMap.hash(key);
-        if (hash < 0) {
-            hash = hash(hash);
-        }
+        int hash = checkHashByKey(key);
         int unit = unit(hash);
         if (unit > hashArrayCheckLength) {
             resize(unit);
@@ -148,23 +139,72 @@ public class HashTMap<K, V> implements TMap<K, V>, Serializable {
         return v;
     }
 
+    /**
+     * 因为{@code #treeMaps}中每一个{@link TTreeMap}的树规模及树叶子的对象都一样，
+     * 所以当通过{@link #unit(int)}方法计算出要访问{@code #treeMaps}的数组下标后需要重新计算传入key在该数组中的hash值。
+     *
+     * @param hash 通过{@link #reHash(int)}方法处理过的hash值
+     * @param unit 通过{@link #unit(int)}方法计算出要访问{@code #treeMaps}的数组下标
+     *
+     * @return 真正执行存入操作的hash值
+     */
     private int storeHash(int hash, int unit) {
         return hash - unit * TTreeMap.NodeRange.TREE_MAX_LENGTH;
     }
 
-    private int hash(int hash) {
+    /**
+     * 判断{@link #hash(Object)}计算出来的值是否为负，如果是负数，执行处理并返回一个正数hash值
+     *
+     * @param hash {@code TTreeMap#hash(Object)}计算出来的值
+     *
+     * @return 正数hash值
+     */
+    private int reHash(int hash) {
         hash += (hashArrayLength * TTreeMap.NodeRange.TREE_MAX_LENGTH);
         if (hash < 0) {
-            return hash(hash);
+            return reHash(hash);
         }
         return hash;
     }
 
+    /**
+     * 检查传入的 <tt>key</tt> 是否为{@code Integer}类型，如果是，则直接返回强转后的值。
+     * 如果不是，则计算该 <tt>key</tt> 的 <tt>hash</tt> 值
+     *
+     * @param key key
+     *
+     * @return <tt>key</tt> 对应的 <tt>hash</tt> 值
+     */
+    private int checkHashByKey(K key) {
+        int hash;
+        if (key instanceof Integer) {
+            hash = (int) key;
+        } else {
+            hash = hash(key);
+            if (hash < 0) {
+                hash = reHash(hash);
+            }
+        }
+        return hash;
+    }
+
+    /**
+     * 根据传入key获取当前Hash数组中要访问的下标
+     *
+     * @param key key
+     *
+     * @return 当前Hash数组中要访问的下标
+     */
     private int unit(int key) {
-        int tempKey = TTreeMap.hash(key);
+        int tempKey = hash(key);
         return --tempKey / TTreeMap.NodeRange.TREE_MAX_LENGTH;
     }
 
+    /**
+     * 根据 <tt>unit</tt> 判定是否需要递归重设Hash数组大小
+     *
+     * @param unit 当前传入key所期望在Hash数组中的下标
+     */
     private void resize(int unit) {
         hashArrayLength += DEFAULT_LOAD_FACTOR;
         hashArrayCheckLength = hashArrayLength - 1;

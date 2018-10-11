@@ -58,14 +58,6 @@ public class TTreeMap<K, V> extends AbstractMap<K, V> implements Map<K, V>, Seri
 
     private static final long serialVersionUID = 8565247786674084606L;
 
-    static final int hash(Object key) {
-        if (key instanceof Integer) {
-            return (Integer) key;
-        }
-        int h;
-        return (h = key.hashCode()) ^ (h >>> 16);
-    }
-
     /** 当前结点范围对象的根对象，祖宗结点 */
     private NodeRange<K, V> root;
 

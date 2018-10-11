@@ -24,22 +24,19 @@
 
 package cn.aberic.trouble.db.util;
 
-import cn.aberic.trouble.db.block.TroubleBlock;
-
-import java.io.Serializable;
-
 /**
- * @author Aberic on 2018/10/11 23:29
+ * @author Aberic on 2018/10/11 23:31
  * @see ClassLoader#defineClass(byte[], int, int)
  * @since 1.0
  */
-public class BlockTreeMap<K, V extends TroubleBlock> extends AbstractMap<K, V> implements Map<K, V>, Serializable {
+abstract class AbstractTMap<K, V> implements TMap<K, V> {
 
-    private static final long serialVersionUID = 5666542770113713739L;
-
-    @Override
-    public Range<K, V> range() {
-        return null;
+    static final int hash(Object key) {
+        if (key instanceof Integer) {
+            return (Integer) key;
+        }
+        int h;
+        return (h = key.hashCode()) ^ (h >>> 16);
     }
 
 }
