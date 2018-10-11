@@ -42,16 +42,6 @@ public abstract class AbstractTMap<K, V> implements TMap<K, V> {
     /**
      * {@inheritDoc}
      *
-     * @implSpec This implementation returns <tt>range().size()</tt>。
-     */
-    @Override
-    public int size() {
-        return range().size();
-    }
-
-    /**
-     * {@inheritDoc}
-     *
      * @implSpec This implementation returns <tt>size() == 0</tt>。
      */
     @Override
@@ -107,16 +97,11 @@ public abstract class AbstractTMap<K, V> implements TMap<K, V> {
     }
 
     /**
-     * 返回此映射中包含的映射关系的{@link AbstractTMap.Range}视图。
+     * 返回此映射中包含的映射关系的{@link Range}视图。
      * 该Range受映射支持，所以对映射的更改可在此Range中反映出来，反之亦然。
      *
      * @return 此映射中包含的映射关系的Range视图
      */
     public abstract Range<K, V> range();
-
-    static final int hash(Object key) {
-        int h;
-        return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
-    }
 
 }
