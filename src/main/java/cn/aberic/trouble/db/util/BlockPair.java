@@ -28,9 +28,9 @@ package cn.aberic.trouble.db.util;
  * 映射项（键-值对）。
  * <tt>BlockTreeMap.range</tt> 方法返回属于此类元素的映射视图。
  *
- * @see BlockTreeMapTest#range()
- * @see BlockTreeMapTest
- * @see BlockTreeMapTest.Node
+ * @see BlockTreeMap#range()
+ * @see BlockTreeMap
+ * @see BlockTreeMap.Node
  * @since 1.0
  */
 public interface BlockPair<K, V, R> {

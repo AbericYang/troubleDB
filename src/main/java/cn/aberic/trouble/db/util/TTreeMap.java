@@ -51,7 +51,7 @@ import java.util.HashMap;
  * v = (int - x(y^?))/x - 1(?)
  *
  * @author Aberic on 2018/10/8 22:07
- * @see ClassLoader#defineClass(byte[], int, int)
+ * @see HashTMap
  * @since 1.0
  */
 public class TTreeMap<K, V> extends AbstractMap<K, V> implements Map<K, V>, Serializable {
@@ -102,12 +102,12 @@ public class TTreeMap<K, V> extends AbstractMap<K, V> implements Map<K, V>, Seri
          * @return {@inheritDoc}
          */
         @Override
-        V putExec(Deque<Integer> vDeque, int temV, int real, K key, V value, int m, int v) {
+        V putExec(Deque<Integer> vDeque, int real, K key, V value, int m, int v) {
             NodeRange<K, V> p = this, c = this;
             int selfV;
             // System.out.println("p.start = " + p.start + " | p.end = " + p.end);
             while (null != vDeque.peek()) {
-                temV = vDeque.pop();
+                int temV = vDeque.pop();
                 selfV = (temV - 1) - ((temV - 1) / TREE_MAX_DEGREE) * TREE_MAX_DEGREE;
 //                System.out.println("temV out = " + temV + " | selfV out = " + selfV);
                 c = (NodeRange<K, V>) p.nodeChildrenRanges[selfV];
@@ -135,7 +135,6 @@ public class TTreeMap<K, V> extends AbstractMap<K, V> implements Map<K, V>, Seri
          *
          * @return {@inheritDoc}
          */
-        @Override
         RangePair<K, V>[] nodes() {
             return nodes;
         }
@@ -145,7 +144,6 @@ public class TTreeMap<K, V> extends AbstractMap<K, V> implements Map<K, V>, Seri
          *
          * @return {@inheritDoc}
          */
-        @Override
         Range<K, V>[] nodeChildrenRanges() {
             return nodeChildrenRanges;
         }

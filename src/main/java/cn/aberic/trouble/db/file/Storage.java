@@ -25,16 +25,16 @@
 //package cn.aberic.trouble.db.file;
 //
 //import cn.aberic.trouble.db.block.TroubleBlock;
-//import cn.aberic.trouble.db.util.BlockTreeMapTest;
+//import cn.aberic.trouble.db.util.BlockTreeMap;
 //
 ///**
 // * @author Aberic on 2018/10/7 23:01
 // * @see ClassLoader#defineClass(byte[], int, int)
 // * @since 1.0
 // */
-//public class Stroage {
+//public class Storage {
 //
-//    public static <T extends TroubleBlock> BlockTreeMapTest.NodeValue save(T t) throws Exception{
+//    public static <T extends TroubleBlock> BlockTreeMap.NodeValue save(T t) throws Exception{
 //        throw new Exception();
 //    }
 //

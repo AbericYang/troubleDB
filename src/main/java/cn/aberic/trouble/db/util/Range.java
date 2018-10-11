@@ -37,24 +37,12 @@ import java.util.LinkedList;
  * @see TTreeMap
  * @since 1.0
  */
-abstract class Range<K, V> {
+abstract class Range<K, V> extends Pair {
 
-    /** B-Tree的层 - n */
-    private final static int TREE_MAX_LEVEL = 3;
-    /** 结点范围对象中的所属子结点数组大小 - x */
-//        protected final static int NODE_ARRAY_LENGTH = 3;
-    final static int NODE_ARRAY_LENGTH = 100;
-    final static int TREE_MAX_LENGTH = 1030300;
-    /** B-Tree的最大度，即结点范围结点拥有子树的数目 - y */
-    final static int TREE_MAX_DEGREE = NODE_ARRAY_LENGTH + 1;
     /** key在当前结点内的下标 - z */
     private int keyIndexInNode = 0;
     /** 当前结点范围对象在整层度中的顺序位置 - v */
     private int degreeForOneLevelNow = 1;
-    /** 每一层的末尾终结位置 */
-    private static int[] levelEveryRangeLastIndexArray;
-    /** 当前结点范围对象所在B-Tree的层（节点默认值=4） - m */
-    int levelNow;
     /** y^(m-1) */
     private int yPowM1;
     /** 结点数组首个对象下必须对应的数字 */
@@ -63,15 +51,6 @@ abstract class Range<K, V> {
     Map.RangePair<K, V>[] nodes;
     /** 当前结点范围的子对象数组，不可扩容 */
     Range<K, V>[] nodeChildrenRanges;
-
-    private static void initLevelEveryRangeLastIndex() {
-        levelEveryRangeLastIndexArray = new int[TREE_MAX_LEVEL + 1];
-        levelEveryRangeLastIndexArray[0] = 0;
-        for (int i = 1; i <= TREE_MAX_LEVEL; i++) {
-            levelEveryRangeLastIndexArray[i] = NODE_ARRAY_LENGTH * (int) Math.pow(TREE_MAX_DEGREE, i - 1) + levelEveryRangeLastIndexArray[i - 1];
-        }
-//            System.out.println("levelEveryRangeLastIndexArray = " + Arrays.toString(levelEveryRangeLastIndexArray));
-    }
 
     /**
      * 指定范围对象中的所属子结点数组大小进行构造，构造结果为顶级/虚结点范围对象
@@ -102,7 +81,9 @@ abstract class Range<K, V> {
     }
 
     /**
-     * 结点间范围对象初始化
+     * 结点间范围对象初始化，并指定其当前所在层
+     *
+     * @param levelNow 结点范围对象被指定的层
      */
     @SuppressWarnings("unchecked")
     private void init(int levelNow) {
@@ -117,18 +98,36 @@ abstract class Range<K, V> {
 //            System.out.println("firstNodeNum = " + firstNodeNum);
     }
 
-    /** 结点数组，不可扩容 */
-    abstract Map.RangePair<K, V>[] nodes();
+    /**
+     * 获取不可扩容的结点数组，并非强制重写。
+     * 如果要使用{@link Range}自身的{@link Range#contains(int)}和{@link Range#get(int, Object)}方法，则必须重写。
+     * 否则，重写{@link Range#contains(int)}和{@link Range#get(int, Object)}方法以完善子类信息。
+     *
+     * @return 不可扩容的结点数组
+     */
+    Map.RangePair<K, V>[] nodes() {
+        return null;
+    }
 
-    /** 当前结点范围的子对象数组，不可扩容 */
-    abstract Range<K, V>[] nodeChildrenRanges();
+    /**
+     * 获取不可扩容的结点范围的子对象数组。
+     * 如果要使用{@link Range}自身的{@link Range#contains(int)}和{@link Range#get(int, Object)}方法，则必须重写。
+     * 否则，重写{@link Range#contains(int)}和{@link Range#get(int, Object)}方法以完善子类信息。
+     *
+     * @return 不可扩容的结点范围的子对象数组
+     */
+    Range<K, V>[] nodeChildrenRanges() {
+        return null;
+    }
 
     /**
      * 如果Range包含指定的元素，则返回 true。
      * 更确切地讲，当且仅当Range包含满足 <tt>(key==null ? e==null : key.equals(e))</tt> 的元素 <tt>e</tt> 时返回 <tt>true</tt> 。
      *
      * @param storeHash 要测试此Range中是否存在的元素
+     *
      * @return 如果此Range包含指定的元素，则返回<tt>true</tt>
+     *
      * @throws ClassCastException   如果指定元素的类型与此Range不兼容（可选）
      * @throws NullPointerException 如果指定的元素为null并且此Range不允许null元素（可选）
      */
@@ -165,7 +164,9 @@ abstract class Range<K, V> {
      * 也可能该映射将该键显示地映射到{@code null}。使用{@link #contains}操作可区分这两种情况。
      *
      * @param key 要返回其关联值的键
+     *
      * @return 指定键所映射的值；如果此映射不包含该键的映射关系，则返回{@code null}
+     *
      * @throws ClassCastException   如果该键对于此映射是不合适的类型（可选）
      * @throws NullPointerException 如果指定键为 null 并且此映射不允许 null 键（可选）
      */
@@ -195,13 +196,15 @@ abstract class Range<K, V> {
     /**
      * 将指定的值与此映射中的指定键关联（可选操作）。
      * 如果此映射以前包含一个该键的映射关系，
-     * 则用指定值替换旧值（当且仅当{@link #contains(int, K) m.contains(k)}返回 <tt>true</tt> 时，
+     * 则用指定值替换旧值（当且仅当{@link #contains(int) m.contains(k)}返回 <tt>true</tt> 时，
      * 才能说映射 <tt>m</tt> 包含键 <tt>k</tt> 的映射关系）。
      *
      * @param key   与指定值关联的键
      * @param value 与指定键关联的值
+     *
      * @return 以前与 <tt>key</tt> 关联的值，如果没有针对 <tt>key</tt> 的映射关系，则返回 <tt>null</tt> 。
      * （如果该实现支持 <tt>null</tt> 值，则返回 <tt>null</tt> 也可能表示此映射以前将 <tt>null</tt> 与 <tt>key</tt> 关联）
+     *
      * @throws UnsupportedOperationException 如果此映射不支持 <tt>put</tt> 操作
      * @throws ClassCastException            如果指定键或值的类不允许将其存储在此映射中
      * @throws NullPointerException          如果指定键或值为 <tt>null</tt> ，并且此映射不允许 <tt>null</tt> 键或值
@@ -225,59 +228,25 @@ abstract class Range<K, V> {
             vDeque.push(temV);
         }
         vDeque.pop();
-        return putExec(vDeque, temV, real, key, value, m, v);
-    }
-
-    abstract V putExec(Deque<Integer> vDeque, int temV, int real, K key, V value, int m, int v);
-
-    private int real(int storeHash) {
-        int m = calculateLevelNow(storeHash); // 当前结点范围对象所在B-Tree的层
-        int v = calculateDegreeForOneLevelNow(storeHash, m); // 当前结点范围对象在整层度中的顺序位置
-        return calculateReal(storeHash, m, v); // 当前key在B-Tree中的真实数字
+        return putExec(vDeque, real, key, value, m, v);
     }
 
     /**
-     * 计算当前传入key所在的层 - m
+     * 处理存入操作并获取存入结果返回值，并非强制重写。
+     * 该方法会在{@link TTreeMap}中进行重写，{@code TTreeMap}并非磁盘存储对象，而是内存缓存对象。
+     * 理论上，该方法仅内存缓存对象重写即可。
      *
-     * @param key key
-     * @return 所在层
-     */
-    private int calculateLevelNow(int key) {
-        for (int i = 0; i < TREE_MAX_LEVEL; i++) {
-            if (key > levelEveryRangeLastIndexArray[i] && key <= levelEveryRangeLastIndexArray[i + 1]) {
-                return TREE_MAX_LEVEL - i;
-            }
-        }
-        throw new RuntimeException();
-    }
-
-    /**
-     * 计算当前结点范围对象在整层度中的顺序位置 - v
+     * @param vDeque 用于存放自下而上每一父结点范围对象在整层度中顺序位置的栈
+     * @param real   真实存入的键
+     * @param key    传入的key
+     * @param value  传入的value
+     * @param m      结点范围对象所在B-Tree的层
+     * @param v      结点范围对象在整层度中的顺序位置
      *
-     * @param key      key
-     * @param levelNow 当前传入key所在的层
-     * @return 顺序位置
+     * @return 计划返回的是旧的值，如果有的话。当没有旧值的时候，就返回当前新存入的值
      */
-    private int calculateDegreeForOneLevelNow(int key, int levelNow) {
-        if ((key - levelEveryRangeLastIndexArray[this.levelNow - levelNow]) % NODE_ARRAY_LENGTH == 0) {
-            // v = (int - x(y^?))/x - 1(?)
-            return (key - levelEveryRangeLastIndexArray[this.levelNow - levelNow]) / NODE_ARRAY_LENGTH;
-        }
-        // v = (int - x(y^?))/x - 1(?)
-        return (key - levelEveryRangeLastIndexArray[this.levelNow - levelNow]) / NODE_ARRAY_LENGTH + 1;
-    }
-
-    /**
-     * 计算当前key在B-Tree中的真实数字
-     *
-     * @param key key
-     * @param m   当前传入key所在的层
-     * @param v   结点范围对象在整层度中的顺序位置
-     * @return 真实数字
-     */
-    private int calculateReal(int key, int m, int v) {
-        // real = (y^(m-1))int -(y^(m-1))(y^(n-m) - v)
-        return (int) (Math.pow(TREE_MAX_DEGREE, m - 1) * (key + v - Math.pow(TREE_MAX_DEGREE, TREE_MAX_LEVEL - m)));
+    V putExec(Deque<Integer> vDeque, int real, K key, V value, int m, int v) {
+        return null;
     }
 
 }

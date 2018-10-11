@@ -149,7 +149,7 @@ public class HashTMap<K, V> extends AbstractTMap<K, V> implements Serializable {
      * @return 真正执行存入操作的hash值
      */
     private int storeHash(int hash, int unit) {
-        return hash - unit * TTreeMap.NodeRange.TREE_MAX_LENGTH;
+        return hash - unit * Pair.TREE_MAX_LENGTH;
     }
 
     /**
@@ -160,7 +160,7 @@ public class HashTMap<K, V> extends AbstractTMap<K, V> implements Serializable {
      * @return 正数hash值
      */
     private int reHash(int hash) {
-        hash += (hashArrayLength * TTreeMap.NodeRange.TREE_MAX_LENGTH);
+        hash += (hashArrayLength * Pair.TREE_MAX_LENGTH);
         if (hash < 0) {
             return reHash(hash);
         }
@@ -197,7 +197,7 @@ public class HashTMap<K, V> extends AbstractTMap<K, V> implements Serializable {
      */
     private int unit(int key) {
         int tempKey = hash(key);
-        return --tempKey / TTreeMap.NodeRange.TREE_MAX_LENGTH;
+        return --tempKey / Pair.TREE_MAX_LENGTH;
     }
 
     /**

@@ -36,7 +36,7 @@ package cn.aberic.trouble.db.util;
  * 那么 <tt>HashBlockMap</tt> 在这种情况下，可以被看做是一个有序表。
  * 并且从1开始进行有序的不间断的传入将会使<tt>HashIntegerMap</tt> 类效率达到最高。
  *
- * <p>哈希表的存储横向数组中，每一列都会维持一个B+Tree，由{@link BlockTreeMapTest}实现。
+ * <p>哈希表的存储横向数组中，每一列都会维持一个B+Tree，由{@link BlockTreeMap}实现。
  *
  * @author Aberic on 2018/10/08 17:13
  * @version 1.0

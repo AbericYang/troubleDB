@@ -67,7 +67,7 @@ public interface Map<K, V> {
     /**
      * 将指定的值与此映射中的指定键关联（可选操作）。
      * 如果此映射以前包含一个该键的映射关系，
-     * 则用指定值替换旧值（当且仅当{@link #containsKey(int, K) m.containsKey(k)}返回 <tt>true</tt> 时，
+     * 则用指定值替换旧值（当且仅当{@link #containsKey(int) m.containsKey(k)}返回 <tt>true</tt> 时，
      * 才能说映射 <tt>m</tt> 包含键 <tt>k</tt> 的映射关系）。
      *
      * @param key   与指定值关联的键
