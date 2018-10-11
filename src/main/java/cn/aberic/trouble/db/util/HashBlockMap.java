@@ -25,7 +25,7 @@
 package cn.aberic.trouble.db.util;
 
 /**
- * 基于哈希表的 <tt>TMap</tt> 的接口实现。此实现提供所有可选的映射操作，并允许使用 <tt>null</tt> 值和 <tt>null</tt> 键，但不推荐。
+ * 基于哈希表的 <tt>Map</tt> 的接口实现。此实现提供所有可选的映射操作，并允许使用 <tt>null</tt> 值和 <tt>null</tt> 键，但不推荐。
  * （除了此类的 <tt>key</tt> 被存入内存，<tt>HashBlockMap</tt> 类与<tt>HashRangeMap</tt> 大致相同。）
  *
  * <p>理论上此类不保证映射的顺序，特别是它不保证该顺序恒久不变。
@@ -40,7 +40,7 @@ package cn.aberic.trouble.db.util;
  *
  * @author Aberic on 2018/10/08 17:13
  * @version 1.0
- * @see TMap
+ * @see Map
  * @see BlockTreeMap
  * @see HashRangeMap
  * @see HashIntegerMap

@@ -36,7 +36,7 @@
 // * @see
 // * @since 1.0
 // */
-//public class BlockTreeMap<K, V extends TroubleBlock> extends AbstractTMap<K, V> implements TMap<K, V>, Serializable {
+//public class BlockTreeMap<K, V extends TroubleBlock> extends AbstractMap<K, V> implements Map<K, V>, Serializable {
 //
 //    private static final long serialVersionUID = 6995005831834163349L;
 //

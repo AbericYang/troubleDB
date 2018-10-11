@@ -25,26 +25,16 @@
 package cn.aberic.trouble.db.util;
 
 /**
- * @author Aberic on 2018/10/11 22:27
- * @see ClassLoader#defineClass(byte[], int, int)
+ * 将键映射到值的对象。一个映射不能包含重复的键；每个键最多只能映射到一个值。
+ *
+ * @author Aberic on 2018/10/08 15:38
+ * @version 1.0
+ * @see AbstractMap
+ * @see // RangeTreeMap
+ * @see // BlockTreeMap
  * @since 1.0
  */
-public interface TMap<K, V> {
-
-    /**
-     * 返回此映射中的键-值映射关系数。
-     * 如果该映射包含的元素大于 <tt>Integer.MAX_VALUE</tt> ，则返回 <tt>Integer.MAX_VALUE</tt> 。
-     *
-     * @return 此映射中的键-值映射关系数
-     */
-    int size();
-
-    /**
-     * 如果此映射未包含键-值映射关系，则返回 <tt>true</tt> 。
-     *
-     * @return 如果此映射未包含键-值映射关系，则返回 <tt>true</tt>
-     */
-    boolean isEmpty();
+public interface Map<K, V> {
 
     /**
      * 如果此映射包含指定键的映射关系，则返回 <tt>true</tt> 。
@@ -56,7 +46,7 @@ public interface TMap<K, V> {
      * @throws ClassCastException   如果该键对于此映射是不合适的类型（可选）
      * @throws NullPointerException 如果指定键为 null 并且此映射不允许 null 键（可选）
      */
-    boolean containsKey(K key);
+    boolean containsKey(int storeHash, K key);
 
     /**
      * 返回指定键所映射的值；如果此映射不包含该键的映射关系，则返回{@code null}。
@@ -72,12 +62,12 @@ public interface TMap<K, V> {
      * @throws ClassCastException   如果该键对于此映射是不合适的类型（可选）
      * @throws NullPointerException 如果指定键为 null 并且此映射不允许 null 键（可选）
      */
-    V get(K key);
+    V get(int storeHash, K key);
 
     /**
      * 将指定的值与此映射中的指定键关联（可选操作）。
      * 如果此映射以前包含一个该键的映射关系，
-     * 则用指定值替换旧值（当且仅当{@link #containsKey(K) m.containsKey(k)}返回 <tt>true</tt> 时，
+     * 则用指定值替换旧值（当且仅当{@link #containsKey(int, K) m.containsKey(k)}返回 <tt>true</tt> 时，
      * 才能说映射 <tt>m</tt> 包含键 <tt>k</tt> 的映射关系）。
      *
      * @param key   与指定值关联的键
@@ -89,5 +79,63 @@ public interface TMap<K, V> {
      * @throws NullPointerException          如果指定键或值为 <tt>null</tt> ，并且此映射不允许 <tt>null</tt> 键或值
      * @throws IllegalArgumentException      如果指定键或值的某些属性不允许将其存储在此映射中
      */
-    V put(K key, V value);
+    V put(int storeHash, K key, V value);
+
+//    /**
+//     * 从指定映射中将所有映射关系复制到此映射中（可选操作）。
+//     * 对于指定映射中的每个键 <tt>k</tt> 到值 <tt>v</tt> 的映射关系，
+//     * 此调用等效于对此映射调用一次{@link #put(Object, Object) put(k, v)}。
+//     * 如果正在进行此操作的同时修改了指定的映射，则此操作的行为是不确定的。
+//     *
+//     * @param m 要存储在此映射中的映射关系
+//     * @throws UnsupportedOperationException 如果此映射不支持 <tt>putAll</tt> 操作
+//     * @throws ClassCastException            如果指定键或值的类不允许将其存储在此映射中
+//     * @throws NullPointerException          如果指定键或值为 <tt>null</tt> ，并且此映射不允许 <tt>null</tt> 键或值
+//     * @throws IllegalArgumentException      如果指定键或值的某些属性不允许将其存储在此映射中
+//     */
+//    void putAll(RangeMap<? extends K, ? extends V> m);
+
+    /**
+     * 映射项（键-值对）。
+     * <tt>RangeTreeMap.range</tt> 方法返回属于此类元素的映射视图。
+     *
+     * @see //RangeTreeMap#range()
+     * @see //RangeTreeMap
+     * @see //RangeTreeMap.Node
+     * @since 1.0
+     */
+    interface RangePair<K, V> {
+
+        /**
+         * 返回与此项对应的键
+         *
+         * @return 与此项对应的键
+         * @throws IllegalStateException 如果已经从底层映射中移除了该项，则实现可以（但不要求）抛出此异常。
+         */
+        K getKey();
+
+        /**
+         * 返回与此项对应的值。如果已经从底层映射中移除了映射关系，则此调用的结果是不确定的。
+         *
+         * @return 与此项对应的值
+         * @throws IllegalStateException 如果已经从底层映射中移除了该项，则实现可以（但不要求）抛出此异常。
+         */
+        V getValue(K k);
+
+        /**
+         * 用指定的值替换与此项对应的值（可选操作）。
+         * 写入该映射，如果已经从映射中移除了映射关系，则此调用的行为是不确定的。
+         *
+         * @param v 要存储在此项中的新值
+         * @return 与此项对应的旧值
+         * @throws UnsupportedOperationException 如果此映射不支持 <tt>put</tt> 操作
+         * @throws ClassCastException            如果指定值的类不允许将其存储在底层映射中
+         * @throws NullPointerException          如果底层映射不允许值为 <tt>null</tt> ，并且指定的值为 <tt>null</tt>
+         * @throws IllegalArgumentException      如果此值的某些方面不允许将其存储在底层映射中
+         * @throws IllegalStateException         如果已经从底层映射中移除了该项，则实现可以，但不要求，抛出此异常
+         */
+        V setValue(K k, V v);
+
+    }
+
 }

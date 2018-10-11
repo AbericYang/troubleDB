@@ -30,7 +30,7 @@ import java.util.LinkedList;
 /**
  * B-tree的层对象。
  *
- * <p>B-tree中每一个层对象{@code Range}都包含至少一个映射项{@link TMap.RangePair}或{@link BlockPair}，
+ * <p>B-tree中每一个层对象{@code Range}都包含至少一个映射项{@link Map.RangePair}或{@link BlockPair}，
  * 且两者内的泛型元素保持一致。
  *
  * @see //RangeTreeMap
@@ -62,7 +62,7 @@ abstract class Range<K, V> {
     /** 结点数组首个对象下必须对应的数字 */
     private int firstNodeNum;
     /** 结点数组，不可扩容 */
-    TMap.RangePair<K, V>[] nodes;
+    Map.RangePair<K, V>[] nodes;
     /** 当前结点范围的子对象数组，不可扩容 */
     Range<K, V>[] nodeChildrenRanges;
 
@@ -113,14 +113,14 @@ abstract class Range<K, V> {
         // B-Tree的最大度/子range集合的数量必为结点集合的大小+1
         nodeChildrenRanges = new Range[TREE_MAX_DEGREE];
         // 结点数组根据设定执行初始化
-        nodes = new TMap.RangePair[NODE_ARRAY_LENGTH];
+        nodes = new Map.RangePair[NODE_ARRAY_LENGTH];
         // real = (1 + z)(y^(m - 1)) + (v - 1)(y^m)
         firstNodeNum = (1 + keyIndexInNode) * yPowM1 + (degreeForOneLevelNow - 1) * (int) Math.pow(TREE_MAX_DEGREE, this.levelNow);
 //            System.out.println("firstNodeNum = " + firstNodeNum);
     }
 
     /** 结点数组，不可扩容 */
-    abstract TMap.RangePair<K, V>[] nodes();
+    abstract Map.RangePair<K, V>[] nodes();
 
     /** 当前结点范围的子对象数组，不可扩容 */
     abstract Range<K, V>[] nodeChildrenRanges();
@@ -134,8 +134,8 @@ abstract class Range<K, V> {
      * @throws ClassCastException   如果指定元素的类型与此Range不兼容（可选）
      * @throws NullPointerException 如果指定的元素为null并且此Range不允许null元素（可选）
      */
-    boolean contains(K key) {
-        return containsByKey(this, real(key));
+    boolean contains(int storeHash, K key) {
+        return containsByKey(this, real(storeHash));
     }
 
     private boolean containsByKey(Range<K, V> range, int real) {
@@ -147,7 +147,7 @@ abstract class Range<K, V> {
             int yPowM1 = range.yPowM1;
             index = gap / yPowM1;
             if (gap % yPowM1 == 0) { // 为子结点集合其中之一
-                TMap.RangePair<K, V> node = nodes()[index];
+                Map.RangePair<K, V> node = nodes()[index];
                 return null != node;
             } else { // 为子范围集合中首个以外的其中之一
                 index += 1;
@@ -171,11 +171,11 @@ abstract class Range<K, V> {
      * @throws ClassCastException   如果该键对于此映射是不合适的类型（可选）
      * @throws NullPointerException 如果指定键为 null 并且此映射不允许 null 键（可选）
      */
-    V get(K key) {
-        return getVByKey(this, real(key));
+    V get(int storeHash, K key) {
+        return getVByKey(this, real(storeHash), key);
     }
 
-    private V getVByKey(Range<K, V> range, int real) {
+    private V getVByKey(Range<K, V> range, int real, K key) {
         int gap = real - firstNodeNum;
         int index;
         if (gap < 0) { // 为子范围集合中首个
@@ -184,20 +184,20 @@ abstract class Range<K, V> {
             int yPowM1 = range.yPowM1;
             index = gap / yPowM1;
             if (gap % yPowM1 == 0) { // 为子结点集合其中之一
-                TMap.RangePair<K, V> node = nodes()[index];
-                return null != node ? node.getValue() : null;
+                Map.RangePair<K, V> node = nodes()[index];
+                return null != node ? node.getValue(key) : null;
             } else { // 为子范围集合中首个以外的其中之一
                 index += 1;
             }
         }
         Range<K, V> rangeNext = range.nodeChildrenRanges()[index];
-        return null != rangeNext ? rangeNext.getVByKey(rangeNext, real) : null;
+        return null != rangeNext ? rangeNext.getVByKey(rangeNext, real, key) : null;
     }
 
     /**
      * 将指定的值与此映射中的指定键关联（可选操作）。
      * 如果此映射以前包含一个该键的映射关系，
-     * 则用指定值替换旧值（当且仅当{@link #contains(K) m.contains(k)}返回 <tt>true</tt> 时，
+     * 则用指定值替换旧值（当且仅当{@link #contains(int, K) m.contains(k)}返回 <tt>true</tt> 时，
      * 才能说映射 <tt>m</tt> 包含键 <tt>k</tt> 的映射关系）。
      *
      * @param key   与指定值关联的键
@@ -209,10 +209,10 @@ abstract class Range<K, V> {
      * @throws NullPointerException          如果指定键或值为 <tt>null</tt> ，并且此映射不允许 <tt>null</tt> 键或值
      * @throws IllegalArgumentException      如果指定键或值的某些属性不允许将其存储在此映射中
      */
-    V put(K key, V value) {
-        int m = calculateLevelNow(IntegerTreeMap.hash(key)); // 当前结点范围对象所在B-Tree的层
-        int v = calculateDegreeForOneLevelNow(IntegerTreeMap.hash(key), m); // 当前结点范围对象在整层度中的顺序位置
-        int real = calculateReal(IntegerTreeMap.hash(key), m, v); // 当前key在B-Tree中的真实数字
+    V put(int storeHash, K key, V value) {
+        int m = calculateLevelNow(storeHash); // 当前结点范围对象所在B-Tree的层
+        int v = calculateDegreeForOneLevelNow(storeHash, m); // 当前结点范围对象在整层度中的顺序位置
+        int real = calculateReal(storeHash, m, v); // 当前key在B-Tree中的真实数字
         return putReal(real, key, value, m, v);
     }
 
@@ -230,12 +230,12 @@ abstract class Range<K, V> {
         return putExec(vDeque, temV, real, key, value, m, v);
     }
 
-    abstract V putExec(Deque<Integer> vDeque, int temV, Integer real, K key, V value, int m, int v);
+    abstract V putExec(Deque<Integer> vDeque, int temV, int real, K key, V value, int m, int v);
 
-    private int real(K key) {
-        int m = calculateLevelNow(IntegerTreeMap.hash(key)); // 当前结点范围对象所在B-Tree的层
-        int v = calculateDegreeForOneLevelNow(IntegerTreeMap.hash(key), m); // 当前结点范围对象在整层度中的顺序位置
-        return calculateReal(IntegerTreeMap.hash(key), m, v); // 当前key在B-Tree中的真实数字
+    private int real(int storeHash) {
+        int m = calculateLevelNow(storeHash); // 当前结点范围对象所在B-Tree的层
+        int v = calculateDegreeForOneLevelNow(storeHash, m); // 当前结点范围对象在整层度中的顺序位置
+        return calculateReal(storeHash, m, v); // 当前key在B-Tree中的真实数字
     }
 
     /**

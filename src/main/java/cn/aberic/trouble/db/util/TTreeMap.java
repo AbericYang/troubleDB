@@ -26,6 +26,7 @@ package cn.aberic.trouble.db.util;
 
 import java.io.Serializable;
 import java.util.Deque;
+import java.util.HashMap;
 
 /**
  * n <====> tree level 0+
@@ -53,7 +54,7 @@ import java.util.Deque;
  * @see ClassLoader#defineClass(byte[], int, int)
  * @since 1.0
  */
-public class IntegerTreeMap<V> extends AbstractTMap<Integer, V> implements TMap<Integer, V>, Serializable {
+public class TTreeMap<K, V> extends AbstractMap<K, V> implements Map<K, V>, Serializable {
 
     private static final long serialVersionUID = 8565247786674084606L;
 
@@ -62,11 +63,11 @@ public class IntegerTreeMap<V> extends AbstractTMap<Integer, V> implements TMap<
             return (Integer) key;
         }
         int h;
-        return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
+        return (h = key.hashCode()) ^ (h >>> 16);
     }
 
     /** 当前结点范围对象的根对象，祖宗结点 */
-    private NodeRange<Integer, V> root;
+    private NodeRange<K, V> root;
 
     /**
      * 指定范围对象中的所属子结点数组大小进行构造，构造中初始化一个顶级结点范围对象
@@ -80,13 +81,8 @@ public class IntegerTreeMap<V> extends AbstractTMap<Integer, V> implements TMap<
      *
      * <p>持续分割会维持一个B+Tree的模型。
      */
-    IntegerTreeMap() {
+    TTreeMap() {
         root = new NodeRange<>();
-    }
-
-    @Override
-    public int size() {
-        return 0;
     }
 
     /**
@@ -95,7 +91,7 @@ public class IntegerTreeMap<V> extends AbstractTMap<Integer, V> implements TMap<
      * @return {@inheritDoc}
      */
     @Override
-    public Range<Integer, V> range() {
+    public Range<K, V> range() {
         return root;
     }
 
@@ -108,8 +104,13 @@ public class IntegerTreeMap<V> extends AbstractTMap<Integer, V> implements TMap<
             super(levelNow, keyIndexInNode, degreeForOneLevelNow);
         }
 
+        /**
+         * {@inheritDoc}
+         *
+         * @return {@inheritDoc}
+         */
         @Override
-        V putExec(Deque<Integer> vDeque, int temV, Integer real, K key, V value, int m, int v) {
+        V putExec(Deque<Integer> vDeque, int temV, int real, K key, V value, int m, int v) {
             NodeRange<K, V> p = this, c = this;
             int selfV;
             // System.out.println("p.start = " + p.start + " | p.end = " + p.end);
@@ -129,19 +130,29 @@ public class IntegerTreeMap<V> extends AbstractTMap<Integer, V> implements TMap<
 //            System.out.println("y = " + TREE_MAX_DEGREE + " | m = " + m + " | n = " + TREE_MAX_LEVEL + " | v = " + v + " | minV = " + minV + " | key = " + key + " | real = " + real);
             Node<K, V> node = (Node<K, V>) c.nodes[minV];
             if (null == node) {
-                node = new Node<>(real, value);
+                node = new Node<>(key, value);
                 c.nodes[minV] = node;
             } else {
-                value = node.setValue(value);
+                value = node.setValue(key, value);
             }
             return value;
         }
 
+        /**
+         * {@inheritDoc}
+         *
+         * @return {@inheritDoc}
+         */
         @Override
         RangePair<K, V>[] nodes() {
             return nodes;
         }
 
+        /**
+         * {@inheritDoc}
+         *
+         * @return {@inheritDoc}
+         */
         @Override
         Range<K, V>[] nodeChildrenRanges() {
             return nodeChildrenRanges;
@@ -159,28 +170,74 @@ public class IntegerTreeMap<V> extends AbstractTMap<Integer, V> implements TMap<
      */
     static class Node<K, V> implements RangePair<K, V> {
 
-        /** 传入key */
-        final int hash;
+        /** 存储k */
         K key;
-        /** 存储Value */
+        /** 存储v */
         V value;
+        /** 存储k-v */
+        HashMap<K, V> map;
 
-        Node(int hash, V value) {
-            this.hash = hash;
-            this.value = value;
+        Node(K key, V value) {
+            if (key instanceof Integer) {
+                this.key = key;
+                this.value = value;
+            } else {
+                map = new HashMap<>();
+                map.put(key, value);
+            }
         }
 
+        /**
+         * {@inheritDoc}
+         *
+         * @return {@inheritDoc}
+         */
         @Override
-        public final K getKey() { return key; }
+        public final K getKey() {
+            if (null != key) {
+                return key;
+            }
+            return map.size() > 0 ? map.keySet().iterator().next() : null;
+        }
 
+        /**
+         * {@inheritDoc}
+         *
+         * @return {@inheritDoc}
+         */
         @Override
-        public final V getValue() { return value; }
+        public final V getValue(K key) {
+            if (key instanceof Integer) {
+                return value;
+            }
+            for (HashMap.Entry<K, V> entry : map.entrySet()) {
+                if (entry.getKey() == key || entry.getKey().equals(key)) {
+                    return entry.getValue();
+                }
+            }
+            return null;
+        }
 
+        /**
+         * {@inheritDoc}
+         *
+         * @return {@inheritDoc}
+         */
         @Override
-        public final V setValue(V newValue) {
-            V oldValue = value;
-            value = newValue;
-            return oldValue;
+        public final V setValue(K key, V newValue) {
+            if (key instanceof Integer) {
+                V oldValue = value;
+                value = newValue;
+                return oldValue;
+            }
+            for (HashMap.Entry<K, V> entry : map.entrySet()) {
+                if (entry.getKey() == key || entry.getKey().equals(key)) {
+                    V oldValue = entry.getValue();
+                    entry.setValue(newValue);
+                    return oldValue;
+                }
+            }
+            return newValue;
         }
 
     }

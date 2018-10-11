@@ -25,29 +25,19 @@
 package cn.aberic.trouble.db.util;
 
 /**
- * 此类提供{@link TMap}接口的骨干实现，以最大限度地减少实现此接口所需的工作。
+ * 此类提供{@link Map}接口的骨干实现，以最大限度地减少实现此接口所需的工作。
  *
  * @author Aberic on 2018/10/08 09:50
  * @version 1.0
- * @see IntegerTreeMap
+ * @see TTreeMap
  * @since 1.0
  */
-public abstract class AbstractTMap<K, V> implements TMap<K, V> {
+public abstract class AbstractMap<K, V> implements Map<K, V> {
 
     /**
      * 唯一的构造方法。（由子类构造方法调用，通常是隐式的。）
      */
-    AbstractTMap() {}
-
-    /**
-     * {@inheritDoc}
-     *
-     * @implSpec This implementation returns <tt>size() == 0</tt>。
-     */
-    @Override
-    public boolean isEmpty() {
-        return size() == 0;
-    }
+    AbstractMap() {}
 
     /**
      * {@inheritDoc}
@@ -63,7 +53,7 @@ public abstract class AbstractTMap<K, V> implements TMap<K, V> {
      * 2、如果是区块内容查询，则值被映射到本地磁盘中，则比{@code #get(Object)}方法所花费的时间要更短。
      */
     @Override
-    public boolean containsKey(K key) { return range().contains(key); }
+    public boolean containsKey(int storeHash, K key) { return range().contains(storeHash, key); }
 
     /**
      * {@inheritDoc}
@@ -79,8 +69,8 @@ public abstract class AbstractTMap<K, V> implements TMap<K, V> {
      * 2、如果是区块内容查询，则值被映射到本地磁盘中，则比{@code #containsKey(Object)}方法所花费的时间要更长。
      */
     @Override
-    public V get(K key) {
-        return range().get(key);
+    public V get(int storeHash, K key) {
+        return range().get(storeHash, key);
     }
 
     /**
@@ -92,8 +82,8 @@ public abstract class AbstractTMap<K, V> implements TMap<K, V> {
      * @throws IllegalArgumentException      {@inheritDoc}
      */
     @Override
-    public V put(K key, V value) {
-        return range().put(key, value);
+    public V put(int storeHash, K key, V value) {
+        return range().put(storeHash, key, value);
     }
 
     /**

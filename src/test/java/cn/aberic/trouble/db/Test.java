@@ -91,55 +91,73 @@ public class Test {
 
 // ====================================================================================================================================
 //
-        HashTMap<String, Integer> map = new HashTMap<>();
+        long startTime, estimatedTime;
+        HashTMap<Integer, Integer> map = new HashTMap<>();
 //        HashIntegerMap<Integer> map = new HashIntegerMap<>();
-//        IntegerTreeMap<Integer> map = new IntegerTreeMap<>();
-//        HashMap<Integer, Integer> hashMap = new HashMap<>();
-//
-//        long startTime = System.currentTimeMillis();
-//        for (int i = 1; i <= 20000000; i++) {
-//            hashMap.put(i, i);
-//        }
-//        long estimatedTime = System.currentTimeMillis() - startTime;
-//        System.out.println("HashMap put 耗时 = " + estimatedTime);
-//
-//        startTime = System.currentTimeMillis();
-//        for (int i = 1; i <= 20000000; i++) {
-//            // System.out.println("map.get(" + i + ") = " + map.get(i));
-//            hashMap.get(i);
-//        }
-//        estimatedTime = System.currentTimeMillis() - startTime;
-//        System.out.println("HashMap get 耗时 = " + estimatedTime);
-//
-//        System.out.println("=============================================================");
-//
-//        startTime = System.currentTimeMillis();
-//        for (int i = 1; i <= 20000000; i++) {
-//            map.put(i, i);
-//        }
-//        estimatedTime = System.currentTimeMillis() - startTime;
-//        System.out.println("IntegerTreeMap put 耗时 = " + estimatedTime);
-//
-//        startTime = System.currentTimeMillis();
-//        for (int i = 1; i <= 20000000; i++) {
-//            // System.out.println("map.get(" + i + ") = " + map.get(i));
-//            map.get(i);
-//        }
-//        estimatedTime = System.currentTimeMillis() - startTime;
-//        System.out.println("IntegerTreeMap get 耗时 = " + estimatedTime);
-//        System.out.println("map.size() = " + map.size());
-//        System.out.println("map.isEmpty() = " + map.isEmpty());
+//        TTreeMap<Integer> map = new TTreeMap<>();
+        HashMap<Integer, Integer> hashMap = new HashMap<>();
+
+        startTime = System.currentTimeMillis();
+        for (int i = 1; i <= 2000000; i++) {
+            map.put(i, i);
+        }
+        estimatedTime = System.currentTimeMillis() - startTime;
+        System.out.println("TTreeMap put 耗时 = " + estimatedTime);
+
+        startTime = System.currentTimeMillis();
+        for (int i = 1; i <= 2000000; i++) {
+            // System.out.println("map.get(" + i + ") = " + map.get(i));
+            map.get(i);
+        }
+        estimatedTime = System.currentTimeMillis() - startTime;
+        System.out.println("TTreeMap get 耗时 = " + estimatedTime);
+        System.out.println("map.size() = " + map.size());
+        System.out.println("map.isEmpty() = " + map.isEmpty());
+
+        System.out.println("=============================================================");
+
+        startTime = System.currentTimeMillis();
+        for (int i = 1; i <= 2000000; i++) {
+            hashMap.put(i, i);
+        }
+        estimatedTime = System.currentTimeMillis() - startTime;
+        System.out.println("HashMap put 耗时 = " + estimatedTime);
+
+        startTime = System.currentTimeMillis();
+        for (int i = 1; i <= 2000000; i++) {
+            // System.out.println("map.get(" + i + ") = " + map.get(i));
+            hashMap.get(i);
+        }
+        estimatedTime = System.currentTimeMillis() - startTime;
+        System.out.println("HashMap get 耗时 = " + estimatedTime);
+
 // ====================================================================================================================================
 
-        for (int i = 1; i <= 5000000; i*=3) {
-            map.put(i + "a", i);
-        }
-        for (int i = 1; i <= 5000000; i*=3) {
-            System.out.println("map.get(" + i + ") = " + map.get(i + "a") + " | map.containsKey(" + i + ") = " + map.containsKey(i + "a"));
-        }
-        for (int i = 1; i <= 5000000; i*=2) {
-            System.out.println("map.get(" + i + ") = " + map.get(i + "a") + " | map.containsKey(" + i + ") = " + map.containsKey(i + "a"));
-        }
+//        for (int i = 1; i <= 5000000; i *= 3) {
+//            map.put(i, i);
+//        }
+//        for (int i = 1; i <= 5000000; i *= 3) {
+//            System.out.println("map.get(" + i + ") = " + map.get(i) + " | map.containsKey(" + i + ") = " + map.containsKey(i));
+//        }
+//        for (int i = 1; i <= 5000000; i *= 2) {
+//            System.out.println("map.get(" + i + ") = " + map.get(i) + " | map.containsKey(" + i + ") = " + map.containsKey(i));
+//        }
+
+// ====================================================================================================================================
+
+
+//        for (int i = 1; i <= 5000000; i*=3) {
+//            map.put(i + "a", i);
+//        }
+//        for (int i = 1; i <= 5000000; i*=3) {
+//            System.out.println("map.get(" + i + ") = " + map.get(i + "a") + " | map.containsKey(" + i + ") = " + map.containsKey(i + "a"));
+//        }
+//        for (int i = 1; i <= 5000000; i*=2) {
+//            System.out.println("map.get(" + i + ") = " + map.get(i + "a") + " | map.containsKey(" + i + ") = " + map.containsKey(i + "a"));
+//        }
+
+// ====================================================================================================================================
+
 //        map.put(158, 158);
 //        map.put(157, "b");
 //        map.put(158, "c");

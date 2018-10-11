@@ -47,7 +47,7 @@ public class HashTMap<K, V> implements TMap<K, V>, Serializable {
     /** 构造哈希表数组检测用大小，始终比{@code #hashArrayLength}小1 */
     private int hashArrayCheckLength;
     /** 有序存储于哈希表中的B-tree */
-    private IntegerTreeMap<V>[] treeMaps;
+    private TTreeMap<K, V>[] treeMaps;
 
     public HashTMap() {
         this(DEFAULT_HASH_LENGTH);
@@ -61,61 +61,116 @@ public class HashTMap<K, V> implements TMap<K, V>, Serializable {
             this.hashArrayLength = hashArrayLength;
         }
         this.hashArrayCheckLength = hashArrayLength - 1;
-        treeMaps = new IntegerTreeMap[this.hashArrayLength];
+        treeMaps = new TTreeMap[this.hashArrayLength];
         for (int i = 0; i < this.hashArrayLength; i++) {
-            IntegerTreeMap<V> treeMap = new IntegerTreeMap<>();
+            TTreeMap<K, V> treeMap = new TTreeMap<>();
             treeMaps[i] = treeMap;
         }
         size = 0;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return {@inheritDoc}
+     */
     @Override
     public int size() {
         return size;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return {@inheritDoc}
+     */
     @Override
     public boolean isEmpty() {
         return size == 0;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return {@inheritDoc}
+     */
     @Override
     public boolean containsKey(K key) {
-        int hash = IntegerTreeMap.hash(key);
+        int hash = TTreeMap.hash(key);
+        if (hash < 0) {
+            hash = hash(hash);
+        }
         int unit = unit(hash);
-        return treeMaps[unit].containsKey(hash - unit * IntegerTreeMap.NodeRange.TREE_MAX_LENGTH);
+        if (unit > hashArrayCheckLength) {
+            return false;
+        }
+        return treeMaps[unit].containsKey(storeHash(hash, unit), key);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return {@inheritDoc}
+     */
     @Override
     public V get(K key) {
-        int hash = IntegerTreeMap.hash(key);
+        int hash = TTreeMap.hash(key);
+        if (hash < 0) {
+            hash = hash(hash);
+        }
         int unit = unit(hash);
-        return treeMaps[unit].get(hash - unit * IntegerTreeMap.NodeRange.TREE_MAX_LENGTH);
+        if (unit > hashArrayCheckLength) {
+            return null;
+        }
+        return treeMaps[unit].get(storeHash(hash, unit), key);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return {@inheritDoc}
+     */
     @Override
     public V put(K key, V value) {
-        int hash = IntegerTreeMap.hash(key);
+        if (null == key) {
+            throw new NullPointerException();
+        }
+        int hash = TTreeMap.hash(key);
+        if (hash < 0) {
+            hash = hash(hash);
+        }
         int unit = unit(hash);
         if (unit > hashArrayCheckLength) {
             resize(unit);
         }
-        V v = treeMaps[unit].put(hash - unit * IntegerTreeMap.NodeRange.TREE_MAX_LENGTH, value);
+        V v = treeMaps[unit].put(storeHash(hash, unit), key, value);
         size++;
         return v;
     }
 
+    private int storeHash(int hash, int unit) {
+        return hash - unit * TTreeMap.NodeRange.TREE_MAX_LENGTH;
+    }
+
+    private int hash(int hash) {
+        hash += (hashArrayLength * TTreeMap.NodeRange.TREE_MAX_LENGTH);
+        if (hash < 0) {
+            return hash(hash);
+        }
+        return hash;
+    }
+
     private int unit(int key) {
-        int tempKey = IntegerTreeMap.hash(key);
-        return --tempKey / IntegerTreeMap.NodeRange.TREE_MAX_LENGTH;
+        int tempKey = TTreeMap.hash(key);
+        return --tempKey / TTreeMap.NodeRange.TREE_MAX_LENGTH;
     }
 
     private void resize(int unit) {
         hashArrayLength += DEFAULT_LOAD_FACTOR;
         hashArrayCheckLength = hashArrayLength - 1;
         treeMaps = Arrays.copyOf(treeMaps, hashArrayLength);
-        treeMaps[hashArrayLength - 1] = new IntegerTreeMap<>();
-        treeMaps[hashArrayLength - 2] = new IntegerTreeMap<>();
+        treeMaps[hashArrayLength - 1] = new TTreeMap<>();
+        treeMaps[hashArrayLength - 2] = new TTreeMap<>();
         if (unit > hashArrayCheckLength) {
             resize(unit);
         }

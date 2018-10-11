@@ -29,7 +29,7 @@
 //import java.io.Serializable;
 //
 ///**
-// * 基于B-Tree的 <tt>TMap</tt> 的接口实现。此实现提供所有可选的映射操作，并允许使用 <tt>null</tt> 值和 <tt>null</tt> 键，但不推荐。
+// * 基于B-Tree的 <tt>Map</tt> 的接口实现。此实现提供所有可选的映射操作，并允许使用 <tt>null</tt> 值和 <tt>null</tt> 键，但不推荐。
 // * （除了此类的 <tt>key</tt> 被存入内存，<tt>RangeTreeMap</tt> 类与<tt>BlockTreeMap</tt> 大致相同。）
 // *
 // * <p>理论上此类不保证映射的顺序，特别是它不保证该顺序恒久不变。
@@ -38,7 +38,7 @@
 // * 注意：这个有序取决于 <tt>key</tt> 的 <tt>hash</tt> 值。
 // * 因此，如果自定义 <tt>key</tt> ，并且 <tt>key</tt> 是 <tt>Integer/int</tt> 类型，且一个从1开始一直到{@link Integer#MAX_VALUE}，中间允许有间断，
 // * 那么 <tt>RangeTreeMap</tt> 在这种情况下，可以被看做是一个有序表。
-// * 并且从1开始进行有序的不间断的传入将会使<tt>IntegerTreeMap</tt> 类效率达到最高。
+// * 并且从1开始进行有序的不间断的传入将会使<tt>TTreeMap</tt> 类效率达到最高。
 // *
 // * @author Aberic on 2018/10/08 12:04
 // * @version 1.0
@@ -46,7 +46,7 @@
 // * @since 1.0
 // */
 //@Slf4j
-//public class RangeTreeMap<K, V> extends AbstractTMap<K, V> implements TMap<K, V>, Serializable {
+//public class RangeTreeMap<K, V> extends AbstractMap<K, V> implements Map<K, V>, Serializable {
 //
 //    private static final long serialVersionUID = 5066322126366247567L;
 //

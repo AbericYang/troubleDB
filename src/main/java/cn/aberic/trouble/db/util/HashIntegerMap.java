@@ -32,7 +32,7 @@
 // * @see ClassLoader#defineClass(byte[], int, int)
 // * @since 1.0
 // */
-//public class HashIntegerMap<V> implements TMap<Integer, V>, Serializable {
+//public class HashIntegerMap<V> implements Map<Integer, V>, Serializable {
 //
 //    private static final long serialVersionUID = 2794796425862934413L;
 //
@@ -47,7 +47,7 @@
 //    /** 构造哈希表数组检测用大小，始终比{@code #hashArrayLength}小1 */
 //    private int hashArrayCheckLength;
 //    /** 有序存储于哈希表中的B-tree */
-//    private IntegerTreeMap<Integer, V>[] treeMaps;
+//    private TTreeMap<Integer, V>[] treeMaps;
 //
 //    public HashIntegerMap() {
 //        this(DEFAULT_HASH_LENGTH);
@@ -61,9 +61,9 @@
 //            this.hashArrayLength = hashArrayLength;
 //        }
 //        this.hashArrayCheckLength = hashArrayLength - 1;
-//        treeMaps = new IntegerTreeMap[this.hashArrayLength];
+//        treeMaps = new TTreeMap[this.hashArrayLength];
 //        for (int i = 0; i < this.hashArrayLength; i++) {
-//            IntegerTreeMap<Integer, V> treeMap = new IntegerTreeMap<>();
+//            TTreeMap<Integer, V> treeMap = new TTreeMap<>();
 //            treeMaps[i] = treeMap;
 //        }
 //        size = 0;
@@ -82,13 +82,13 @@
 //    @Override
 //    public boolean containsKey(Integer key) {
 //        int unit = unit(key);
-//        return treeMaps[unit].containsKey(key - unit * IntegerTreeMap.NodeRange.TREE_MAX_LENGTH);
+//        return treeMaps[unit].containsKey(key - unit * TTreeMap.NodeRange.TREE_MAX_LENGTH);
 //    }
 //
 //    @Override
 //    public V get(Integer key) {
 //        int unit = unit(key);
-//        return treeMaps[unit].get(key - unit * IntegerTreeMap.NodeRange.TREE_MAX_LENGTH);
+//        return treeMaps[unit].get(key - unit * TTreeMap.NodeRange.TREE_MAX_LENGTH);
 //    }
 //
 //    @Override
@@ -97,22 +97,22 @@
 //        if (unit > hashArrayCheckLength) {
 //            resize(unit);
 //        }
-//        V v = treeMaps[unit].put(key - unit * IntegerTreeMap.NodeRange.TREE_MAX_LENGTH, value);
+//        V v = treeMaps[unit].put(key - unit * TTreeMap.NodeRange.TREE_MAX_LENGTH, value);
 //        size++;
 //        return v;
 //    }
 //
 //    private int unit(int key) {
-//        int tempKey = IntegerTreeMap.hash(key);
-//        return --tempKey / IntegerTreeMap.NodeRange.TREE_MAX_LENGTH;
+//        int tempKey = TTreeMap.hash(key);
+//        return --tempKey / TTreeMap.NodeRange.TREE_MAX_LENGTH;
 //    }
 //
 //    private void resize(int unit) {
 //        hashArrayLength += DEFAULT_LOAD_FACTOR;
 //        hashArrayCheckLength = hashArrayLength - 1;
 //        treeMaps = Arrays.copyOf(treeMaps, hashArrayLength);
-//        treeMaps[hashArrayLength - 1] = new IntegerTreeMap<>();
-//        treeMaps[hashArrayLength - 2] = new IntegerTreeMap<>();
+//        treeMaps[hashArrayLength - 1] = new TTreeMap<>();
+//        treeMaps[hashArrayLength - 2] = new TTreeMap<>();
 //        if (unit > hashArrayCheckLength) {
 //            resize(unit);
 //        }
