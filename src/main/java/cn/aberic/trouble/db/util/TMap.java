@@ -32,21 +32,6 @@ package cn.aberic.trouble.db.util;
 public interface TMap<K, V> {
 
     /**
-     * 返回此映射中的键-值映射关系数。
-     * 如果该映射包含的元素大于 <tt>Integer.MAX_VALUE</tt> ，则返回 <tt>Integer.MAX_VALUE</tt> 。
-     *
-     * @return 此映射中的键-值映射关系数
-     */
-    int size();
-
-    /**
-     * 如果此映射未包含键-值映射关系，则返回 <tt>true</tt> 。
-     *
-     * @return 如果此映射未包含键-值映射关系，则返回 <tt>true</tt>
-     */
-    boolean isEmpty();
-
-    /**
      * 如果此映射包含指定键的映射关系，则返回 <tt>true</tt> 。
      * 更确切地讲，当且仅当此映射包含针对满足 <tt>(key==null ? k==null : key.equals(k))</tt> 的键 <tt>k</tt> 的映射关系时，返回 true。
      * （最多只能有一个这样的映射关系）。

@@ -66,7 +66,7 @@ public class TTreeMap<K, V> extends AbstractMap<K, V> implements Map<K, V>, Seri
      *
      * <p>顶级结点范围对象为所有结点范围对象的祖宗结点，
      * 它的存在就是为了方便构造，但当第一个参数被put的时候，就会将结点的各个范围进行传入赋值或切割，
-     * 直到切割数量达到{@code {@link NodeRange#NODE_ARRAY_LENGTH } + 1}，即满足分裂条件。
+     * 直到切割数量达到{@code {@link NodeRange#nodeArrayLength } + 1}，即满足分裂条件。
      * 当满足分裂条件后，{@code RangeTreeMap.NodeRange}开始诞生一个子结点范围数组对象，并继续按照上述条件进行后续分割操作。
      *
      * <p>初始化时结点所属范围起始位置默认0，结点所属范围终止位置默认无穷大
@@ -75,6 +75,10 @@ public class TTreeMap<K, V> extends AbstractMap<K, V> implements Map<K, V>, Seri
      */
     TTreeMap() {
         root = new NodeRange<>();
+    }
+
+    TTreeMap(int treeMaxLevel, int nodeArrayLength) {
+        root = new NodeRange<>(treeMaxLevel, nodeArrayLength);
     }
 
     /**
@@ -90,10 +94,15 @@ public class TTreeMap<K, V> extends AbstractMap<K, V> implements Map<K, V>, Seri
     static class NodeRange<K, V> extends Range<K, V> {
 
         NodeRange() {
+            super();
         }
 
-        NodeRange(int levelNow, int keyIndexInNode, int degreeForOneLevelNow) {
-            super(levelNow, keyIndexInNode, degreeForOneLevelNow);
+        NodeRange(int treeMaxLevel, int nodeArrayLength) {
+            super(treeMaxLevel, nodeArrayLength);
+        }
+
+        NodeRange(int levelNow, int keyIndexInNode, int degreeForOneLevelNow, int treeMaxLevel, int nodeArrayLength) {
+            super(levelNow, keyIndexInNode, degreeForOneLevelNow, treeMaxLevel, nodeArrayLength);
         }
 
         /**
@@ -108,18 +117,18 @@ public class TTreeMap<K, V> extends AbstractMap<K, V> implements Map<K, V>, Seri
             // System.out.println("p.start = " + p.start + " | p.end = " + p.end);
             while (null != vDeque.peek()) {
                 int temV = vDeque.pop();
-                selfV = (temV - 1) - ((temV - 1) / TREE_MAX_DEGREE) * TREE_MAX_DEGREE;
+                selfV = (temV - 1) - ((temV - 1) / treeMaxDegree) * treeMaxDegree;
 //                System.out.println("temV out = " + temV + " | selfV out = " + selfV);
                 c = (NodeRange<K, V>) p.nodeChildrenRanges[selfV];
                 if (null == c) {
-                    c = new NodeRange<>(p.levelNow - 1, 0, temV);
+                    c = new NodeRange<>(p.levelNow - 1, 0, temV, treeMaxLevel, nodeArrayLength);
                     p.nodeChildrenRanges[selfV] = c;
                 }
                 p = c;
             }
             // z = (real - (v - 1)(y^m))/(y^(m - 1)) - 1
-            int minV = (int) ((real - (v - 1) * Math.pow(TREE_MAX_DEGREE, m)) / Math.pow(TREE_MAX_DEGREE, m - 1) - 1);
-//            System.out.println("y = " + TREE_MAX_DEGREE + " | m = " + m + " | n = " + TREE_MAX_LEVEL + " | v = " + v + " | minV = " + minV + " | key = " + key + " | real = " + real);
+            int minV = (int) ((real - (v - 1) * Math.pow(treeMaxDegree, m)) / Math.pow(treeMaxDegree, m - 1) - 1);
+//            System.out.println("y = " + treeMaxDegree + " | m = " + m + " | n = " + treeMaxLevel + " | v = " + v + " | minV = " + minV + " | key = " + key + " | real = " + real);
             Node<K, V> node = (Node<K, V>) c.nodes[minV];
             if (null == node) {
                 node = new Node<>(key, value);

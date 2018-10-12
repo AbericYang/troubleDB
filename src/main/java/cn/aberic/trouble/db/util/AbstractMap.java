@@ -53,7 +53,7 @@ public abstract class AbstractMap<K, V> implements Map<K, V> {
      * 2、如果是区块内容查询，则值被映射到本地磁盘中，则比{@code #get(Object)}方法所花费的时间要更短。
      */
     @Override
-    public boolean containsKey(int storeHash) { return range().contains(storeHash); }
+    public boolean containsKey(int unit, int storeHash) { return range().contains(unit, storeHash); }
 
     /**
      * {@inheritDoc}
@@ -69,8 +69,8 @@ public abstract class AbstractMap<K, V> implements Map<K, V> {
      * 2、如果是区块内容查询，则值被映射到本地磁盘中，则比{@code #containsKey(Object)}方法所花费的时间要更长。
      */
     @Override
-    public V get(int storeHash, K key) {
-        return range().get(storeHash, key);
+    public V get(int unit, int storeHash, K key) {
+        return range().get(unit, storeHash, key);
     }
 
     /**
@@ -82,8 +82,8 @@ public abstract class AbstractMap<K, V> implements Map<K, V> {
      * @throws IllegalArgumentException      {@inheritDoc}
      */
     @Override
-    public V put(int storeHash, K key, V value) {
-        return range().put(storeHash, key, value);
+    public V put(int unit, int storeHash, K key, V value) {
+        return range().put(unit, storeHash, key, value);
     }
 
     /**

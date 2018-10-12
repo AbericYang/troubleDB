@@ -30,8 +30,8 @@ package cn.aberic.trouble.db.util;
  * @author Aberic on 2018/10/08 15:38
  * @version 1.0
  * @see AbstractMap
- * @see // RangeTreeMap
- * @see // BlockTreeMap
+ * @see TTreeMap
+ * @see StorageTreeMap
  * @since 1.0
  */
 public interface Map<K, V> {
@@ -46,7 +46,7 @@ public interface Map<K, V> {
      * @throws ClassCastException   如果该键对于此映射是不合适的类型（可选）
      * @throws NullPointerException 如果指定键为 null 并且此映射不允许 null 键（可选）
      */
-    boolean containsKey(int storeHash);
+    boolean containsKey(int unit, int storeHash);
 
     /**
      * 返回指定键所映射的值；如果此映射不包含该键的映射关系，则返回{@code null}。
@@ -62,12 +62,12 @@ public interface Map<K, V> {
      * @throws ClassCastException   如果该键对于此映射是不合适的类型（可选）
      * @throws NullPointerException 如果指定键为 null 并且此映射不允许 null 键（可选）
      */
-    V get(int storeHash, K key);
+    V get(int unit, int storeHash, K key);
 
     /**
      * 将指定的值与此映射中的指定键关联（可选操作）。
      * 如果此映射以前包含一个该键的映射关系，
-     * 则用指定值替换旧值（当且仅当{@link #containsKey(int) m.containsKey(k)}返回 <tt>true</tt> 时，
+     * 则用指定值替换旧值（当且仅当{@link #containsKey(int, int) m.containsKey(k)}返回 <tt>true</tt> 时，
      * 才能说映射 <tt>m</tt> 包含键 <tt>k</tt> 的映射关系）。
      *
      * @param key   与指定值关联的键
@@ -79,7 +79,7 @@ public interface Map<K, V> {
      * @throws NullPointerException          如果指定键或值为 <tt>null</tt> ，并且此映射不允许 <tt>null</tt> 键或值
      * @throws IllegalArgumentException      如果指定键或值的某些属性不允许将其存储在此映射中
      */
-    V put(int storeHash, K key, V value);
+    V put(int unit, int storeHash, K key, V value);
 
 //    /**
 //     * 从指定映射中将所有映射关系复制到此映射中（可选操作）。
@@ -99,9 +99,8 @@ public interface Map<K, V> {
      * 映射项（键-值对）。
      * <tt>RangeTreeMap.range</tt> 方法返回属于此类元素的映射视图。
      *
-     * @see //RangeTreeMap#range()
-     * @see //RangeTreeMap
-     * @see //RangeTreeMap.Node
+     * @see TTreeMap#range()
+     * @see Range
      * @since 1.0
      */
     interface RangePair<K, V> {

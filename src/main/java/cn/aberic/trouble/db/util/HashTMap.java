@@ -42,19 +42,21 @@ public class HashTMap<K, V> extends AbstractTMap<K, V> implements Serializable {
 
     /** 当前Hash表中数据大小 */
     private int size;
-    /** 构造哈希表数组大小 */
-    private int hashArrayLength;
     /** 构造哈希表数组检测用大小，始终比{@code #hashArrayLength}小1 */
     private int hashArrayCheckLength;
     /** 有序存储于哈希表中的B-tree */
     private TTreeMap<K, V>[] treeMaps;
 
     public HashTMap() {
-        this(DEFAULT_HASH_LENGTH);
+        this(DEFAULT_HASH_LENGTH, 0 , 0);
+    }
+
+    public HashTMap(int treeMaxLevel, int nodeArrayLength) {
+        this(DEFAULT_HASH_LENGTH, treeMaxLevel, nodeArrayLength);
     }
 
     @SuppressWarnings("unchecked")
-    private HashTMap(int hashArrayLength) {
+    private HashTMap(int hashArrayLength, int treeMaxLevel, int nodeArrayLength) {
         if (hashArrayLength <= 0) {
             this.hashArrayLength = DEFAULT_HASH_LENGTH;
         } else {
@@ -63,9 +65,10 @@ public class HashTMap<K, V> extends AbstractTMap<K, V> implements Serializable {
         this.hashArrayCheckLength = hashArrayLength - 1;
         treeMaps = new TTreeMap[this.hashArrayLength];
         for (int i = 0; i < this.hashArrayLength; i++) {
-            TTreeMap<K, V> treeMap = new TTreeMap<>();
+            TTreeMap<K, V> treeMap = new TTreeMap<>(treeMaxLevel, nodeArrayLength);
             treeMaps[i] = treeMap;
         }
+        treeMaxLength = treeMaps[0].range().treeMaxLength;
         size = 0;
     }
 
@@ -101,7 +104,7 @@ public class HashTMap<K, V> extends AbstractTMap<K, V> implements Serializable {
         if (unit > hashArrayCheckLength) {
             return false;
         }
-        return treeMaps[unit].containsKey(storeHash(hash, unit));
+        return treeMaps[unit].containsKey(unit, storeHash(hash, unit));
     }
 
     /**
@@ -116,7 +119,7 @@ public class HashTMap<K, V> extends AbstractTMap<K, V> implements Serializable {
         if (unit > hashArrayCheckLength) {
             return null;
         }
-        return treeMaps[unit].get(storeHash(hash, unit), key);
+        return treeMaps[unit].get(unit, storeHash(hash, unit), key);
     }
 
     /**
@@ -134,70 +137,9 @@ public class HashTMap<K, V> extends AbstractTMap<K, V> implements Serializable {
         if (unit > hashArrayCheckLength) {
             resize(unit);
         }
-        V v = treeMaps[unit].put(storeHash(hash, unit), key, value);
+        V v = treeMaps[unit].put(unit, storeHash(hash, unit), key, value);
         size++;
         return v;
-    }
-
-    /**
-     * 因为{@code #treeMaps}中每一个{@link TTreeMap}的树规模及树叶子的对象都一样，
-     * 所以当通过{@link #unit(int)}方法计算出要访问{@code #treeMaps}的数组下标后需要重新计算传入key在该数组中的hash值。
-     *
-     * @param hash 通过{@link #reHash(int)}方法处理过的hash值
-     * @param unit 通过{@link #unit(int)}方法计算出要访问{@code #treeMaps}的数组下标
-     *
-     * @return 真正执行存入操作的hash值
-     */
-    private int storeHash(int hash, int unit) {
-        return hash - unit * Pair.TREE_MAX_LENGTH;
-    }
-
-    /**
-     * 判断{@link #hash(Object)}计算出来的值是否为负，如果是负数，执行处理并返回一个正数hash值
-     *
-     * @param hash {@code TTreeMap#hash(Object)}计算出来的值
-     *
-     * @return 正数hash值
-     */
-    private int reHash(int hash) {
-        hash += (hashArrayLength * Pair.TREE_MAX_LENGTH);
-        if (hash < 0) {
-            return reHash(hash);
-        }
-        return hash;
-    }
-
-    /**
-     * 检查传入的 <tt>key</tt> 是否为{@code Integer}类型，如果是，则直接返回强转后的值。
-     * 如果不是，则计算该 <tt>key</tt> 的 <tt>hash</tt> 值
-     *
-     * @param key key
-     *
-     * @return <tt>key</tt> 对应的 <tt>hash</tt> 值
-     */
-    private int checkHashByKey(K key) {
-        int hash;
-        if (key instanceof Integer) {
-            hash = (int) key;
-        } else {
-            hash = hash(key);
-            if (hash < 0) {
-                hash = reHash(hash);
-            }
-        }
-        return hash;
-    }
-
-    /**
-     * 根据传入key获取当前Hash数组中要访问的下标
-     *
-     * @param key key
-     *
-     * @return 当前Hash数组中要访问的下标
-     */
-    private int unit(int key) {
-        int tempKey = hash(key);
-        return --tempKey / Pair.TREE_MAX_LENGTH;
     }
 
     /**

@@ -30,7 +30,7 @@ import java.util.LinkedList;
 /**
  * B-tree的层对象。
  *
- * <p>B-tree中每一个层对象{@code Range}都包含至少一个映射项{@link Map.RangePair}或{@link BlockPair}，
+ * <p>B-tree中每一个层对象{@code Range}都包含至少一个映射项{@link Map.RangePair}，
  * 且两者内的泛型元素保持一致。
  *
  * @see AbstractMap
@@ -63,8 +63,11 @@ abstract class Range<K, V> extends Pair {
      * <p>持续分割会维持一个B-Tree的模型。
      */
     Range() {
-        initLevelEveryRangeLastIndex();
-        init(TREE_MAX_LEVEL);
+        this(0, 0);
+    }
+
+    Range(int treeMaxLevel, int nodeArrayLength) {
+        this(-1, 0, 1, treeMaxLevel, nodeArrayLength);
     }
 
     /**
@@ -74,7 +77,8 @@ abstract class Range<K, V> extends Pair {
      * @param keyIndexInNode       key在当前结点内的下标 - z
      * @param degreeForOneLevelNow 当前结点范围对象在整层度中的顺序位置 - v
      */
-    Range(int levelNow, int keyIndexInNode, int degreeForOneLevelNow) {
+    Range(int levelNow, int keyIndexInNode, int degreeForOneLevelNow, int treeMaxLevel, int nodeArrayLength) {
+        super(treeMaxLevel, nodeArrayLength);
         this.keyIndexInNode = keyIndexInNode;
         this.degreeForOneLevelNow = degreeForOneLevelNow;
         init(levelNow);
@@ -87,21 +91,21 @@ abstract class Range<K, V> extends Pair {
      */
     @SuppressWarnings("unchecked")
     private void init(int levelNow) {
-        this.levelNow = levelNow;
-        this.yPowM1 = (int) Math.pow(TREE_MAX_DEGREE, this.levelNow - 1);
+        this.levelNow = levelNow == -1 ? treeMaxLevel : levelNow;
+        this.yPowM1 = (int) Math.pow(treeMaxDegree, this.levelNow - 1);
         // B-Tree的最大度/子range集合的数量必为结点集合的大小+1
-        nodeChildrenRanges = new Range[TREE_MAX_DEGREE];
+        nodeChildrenRanges = new Range[treeMaxDegree];
         // 结点数组根据设定执行初始化
-        nodes = new Map.RangePair[NODE_ARRAY_LENGTH];
+        nodes = new Map.RangePair[nodeArrayLength];
         // real = (1 + z)(y^(m - 1)) + (v - 1)(y^m)
-        firstNodeNum = (1 + keyIndexInNode) * yPowM1 + (degreeForOneLevelNow - 1) * (int) Math.pow(TREE_MAX_DEGREE, this.levelNow);
+        firstNodeNum = (1 + keyIndexInNode) * yPowM1 + (degreeForOneLevelNow - 1) * (int) Math.pow(treeMaxDegree, this.levelNow);
 //            System.out.println("firstNodeNum = " + firstNodeNum);
     }
 
     /**
      * 获取不可扩容的结点数组，并非强制重写。
-     * 如果要使用{@link Range}自身的{@link Range#contains(int)}和{@link Range#get(int, Object)}方法，则必须重写。
-     * 否则，重写{@link Range#contains(int)}和{@link Range#get(int, Object)}方法以完善子类信息。
+     * 如果要使用{@link Range}自身的{@link Range#contains(int, int)}和{@link Range#get(int, int, Object)}方法，则必须重写。
+     * 否则，重写{@link Range#contains(int, int)}和{@link Range#get(int, int, Object)}方法以完善子类信息。
      *
      * @return 不可扩容的结点数组
      */
@@ -110,9 +114,9 @@ abstract class Range<K, V> extends Pair {
     }
 
     /**
-     * 获取不可扩容的结点范围的子对象数组。
-     * 如果要使用{@link Range}自身的{@link Range#contains(int)}和{@link Range#get(int, Object)}方法，则必须重写。
-     * 否则，重写{@link Range#contains(int)}和{@link Range#get(int, Object)}方法以完善子类信息。
+     * 获取不可扩容的结点范围的子对象数组，并非强制重写。
+     * 如果要使用{@link Range}自身的{@link Range#contains(int, int)}和{@link Range#get(int, int, Object)}方法，则必须重写。
+     * 否则，重写{@link Range#contains(int, int)}和{@link Range#get(int, int, Object)}方法以完善子类信息。
      *
      * @return 不可扩容的结点范围的子对象数组
      */
@@ -124,14 +128,13 @@ abstract class Range<K, V> extends Pair {
      * 如果Range包含指定的元素，则返回 true。
      * 更确切地讲，当且仅当Range包含满足 <tt>(key==null ? e==null : key.equals(e))</tt> 的元素 <tt>e</tt> 时返回 <tt>true</tt> 。
      *
+     * @param unit      传入key当前Hash数组中要访问的下标
      * @param storeHash 要测试此Range中是否存在的元素
-     *
      * @return 如果此Range包含指定的元素，则返回<tt>true</tt>
-     *
      * @throws ClassCastException   如果指定元素的类型与此Range不兼容（可选）
      * @throws NullPointerException 如果指定的元素为null并且此Range不允许null元素（可选）
      */
-    boolean contains(int storeHash) {
+    boolean contains(int unit, int storeHash) {
         return containsByKey(this, real(storeHash));
     }
 
@@ -163,14 +166,13 @@ abstract class Range<K, V> extends Pair {
      * <p>如果此映射允许{@code null}值，则返回{@code null}值并不一定表示该映射不包含该键的映射关系；
      * 也可能该映射将该键显示地映射到{@code null}。使用{@link #contains}操作可区分这两种情况。
      *
-     * @param key 要返回其关联值的键
-     *
+     * @param unit 传入key当前Hash数组中要访问的下标
+     * @param key  要返回其关联值的键
      * @return 指定键所映射的值；如果此映射不包含该键的映射关系，则返回{@code null}
-     *
      * @throws ClassCastException   如果该键对于此映射是不合适的类型（可选）
      * @throws NullPointerException 如果指定键为 null 并且此映射不允许 null 键（可选）
      */
-    V get(int storeHash, K key) {
+    V get(int unit, int storeHash, K key) {
         return getVByKey(this, real(storeHash), key);
     }
 
@@ -196,21 +198,20 @@ abstract class Range<K, V> extends Pair {
     /**
      * 将指定的值与此映射中的指定键关联（可选操作）。
      * 如果此映射以前包含一个该键的映射关系，
-     * 则用指定值替换旧值（当且仅当{@link #contains(int) m.contains(k)}返回 <tt>true</tt> 时，
+     * 则用指定值替换旧值（当且仅当{@link #contains(int, int) m.contains(k)}返回 <tt>true</tt> 时，
      * 才能说映射 <tt>m</tt> 包含键 <tt>k</tt> 的映射关系）。
      *
+     * @param unit  传入key当前Hash数组中要访问的下标
      * @param key   与指定值关联的键
      * @param value 与指定键关联的值
-     *
      * @return 以前与 <tt>key</tt> 关联的值，如果没有针对 <tt>key</tt> 的映射关系，则返回 <tt>null</tt> 。
      * （如果该实现支持 <tt>null</tt> 值，则返回 <tt>null</tt> 也可能表示此映射以前将 <tt>null</tt> 与 <tt>key</tt> 关联）
-     *
      * @throws UnsupportedOperationException 如果此映射不支持 <tt>put</tt> 操作
      * @throws ClassCastException            如果指定键或值的类不允许将其存储在此映射中
      * @throws NullPointerException          如果指定键或值为 <tt>null</tt> ，并且此映射不允许 <tt>null</tt> 键或值
      * @throws IllegalArgumentException      如果指定键或值的某些属性不允许将其存储在此映射中
      */
-    V put(int storeHash, K key, V value) {
+    V put(int unit, int storeHash, K key, V value) {
         int m = calculateLevelNow(storeHash); // 当前结点范围对象所在B-Tree的层
         int v = calculateDegreeForOneLevelNow(storeHash, m); // 当前结点范围对象在整层度中的顺序位置
         int real = calculateReal(storeHash, m, v); // 当前key在B-Tree中的真实数字
@@ -222,8 +223,8 @@ abstract class Range<K, V> extends Pair {
         Deque<Integer> vDeque = new LinkedList<>();
         vDeque.push(v); // 先把自己push到最底层
         int temV = v;
-        for (int i = m; i < TREE_MAX_LEVEL; i++) { // 从下至上开始push当前值的层层结点范围对象所在整层度中的顺序位置
-            temV = (temV - 1) / TREE_MAX_DEGREE + 1;
+        for (int i = m; i < treeMaxLevel; i++) { // 从下至上开始push当前值的层层结点范围对象所在整层度中的顺序位置
+            temV = (temV - 1) / treeMaxDegree + 1;
 //                System.out.println("temV in = " + temV);
             vDeque.push(temV);
         }
@@ -242,7 +243,6 @@ abstract class Range<K, V> extends Pair {
      * @param value  传入的value
      * @param m      结点范围对象所在B-Tree的层
      * @param v      结点范围对象在整层度中的顺序位置
-     *
      * @return 计划返回的是旧的值，如果有的话。当没有旧值的时候，就返回当前新存入的值
      */
     V putExec(Deque<Integer> vDeque, int real, K key, V value, int m, int v) {
