@@ -24,6 +24,7 @@
 
 package cn.aberic.trouble.db.core;
 
+import cn.aberic.trouble.db.block.TroubleBlock;
 import cn.aberic.trouble.db.util.HashStorageMap;
 
 /**
@@ -32,9 +33,9 @@ import cn.aberic.trouble.db.util.HashStorageMap;
  * @see
  * @since 1.0
  */
-public class TDBManager {
+public class TDBManager<V extends TroubleBlock> {
 
-    private HashStorageMap<String, TDBTable> map;
+    private HashStorageMap<String, TDBTable<Integer, V>> map;
     private TDBConfig config;
 
     public TDBManager() {
@@ -42,20 +43,20 @@ public class TDBManager {
         config = new TDBConfig();
     }
 
-    public <K, V> void createTable(String name) {
-        map.put(name, new TDBTable<K, V>(name, config));
+    public void createTable(String name) {
+        map.put(name, new TDBTable<>(config));
     }
 
-//    public <K> boolean containsKey(String name, K key) {
-//        return map.get(name).containsKey(key);
-//    }
-//
-//    public <K, V> V get(String name, K key) {
-//        return map.get(name).get(key);
-//    }
-//
-//    <K, V> V put(String name, K key, V value) {
-//        return map.get(name).put(key, value);
-//    }
+    public boolean containsKey(String name, int key) {
+        return map.get(name).containsKey(key);
+    }
+
+    public V get(String name, int key) {
+        return map.get(name).get(key);
+    }
+
+    public V put(String name, int key, V value) {
+        return map.get(name).put(key, value);
+    }
 
 }

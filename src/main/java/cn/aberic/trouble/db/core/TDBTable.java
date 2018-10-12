@@ -10,13 +10,9 @@ import cn.aberic.trouble.db.util.HashStorageMap;
  */
 public class TDBTable<K, V> {
 
-    private String name;
-    private TDBConfig config;
     private HashStorageMap<K, V> map;
 
-    TDBTable(String name, TDBConfig config) {
-        this.name = name;
-        this.config = config;
+    TDBTable(TDBConfig config) {
         map = new HashStorageMap<>(config.treeMaxLevel, config.nodeArrayLength);
     }
 

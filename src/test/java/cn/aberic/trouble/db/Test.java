@@ -24,6 +24,7 @@
 
 package cn.aberic.trouble.db;
 
+import cn.aberic.trouble.db.block.TroubleBlock;
 import cn.aberic.trouble.db.core.TDBManager;
 import cn.aberic.trouble.db.core.TDBTable;
 import cn.aberic.trouble.db.util.HashTMap;
@@ -93,8 +94,11 @@ public class Test {
 
 // ====================================================================================================================================
 //
-        TDBManager manager = null;
-        manager.createDBIndex("name", null);
+        TDBManager<TroubleBlock> manager = new TDBManager<>();
+        manager.createTable("test");
+        TroubleBlock block = new TroubleBlock(null, null);
+        manager.put("test", 1, block);
+        manager.get("test", 1);
         long startTime, estimatedTime;
         HashTMap<Integer, Integer> map = new HashTMap<>(3, 100);
 //        HashIntegerMap<Integer> map = new HashIntegerMap<>();
