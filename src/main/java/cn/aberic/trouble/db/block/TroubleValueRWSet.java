@@ -45,14 +45,14 @@ import java.util.Queue;
  * @see TroubleValueWrite
  * @since 1.0
  */
-public class TroubleValueRWSet {
+public class TroubleValueRWSet<R extends TroubleValueRead, W extends TroubleValueWrite> {
 
     /** 交易读内容 */
     @JSONField(name = "r")
-    private Queue<TroubleValueRead> reads;
+    private Queue<R> reads;
     /** 交易写内容 */
     @JSONField(name = "w")
-    private Queue<TroubleValueWrite> writes;
+    private Queue<W> writes;
 
     public TroubleValueRWSet() {
         reads = new LinkedList<>();
@@ -60,28 +60,28 @@ public class TroubleValueRWSet {
     }
 
     /** 新增一条读数据 */
-    public void offerRead(TroubleValueRead read) {
+    public void offerRead(R read) {
         this.reads.offer(read);
     }
 
     /** 新增一条写数据 */
-    public void offerWrite(TroubleValueWrite write) {
+    public void offerWrite(W write) {
         this.writes.offer(write);
     }
 
-    public void setReads(Queue<TroubleValueRead> reads) {
+    public void setReads(Queue<R> reads) {
         this.reads = reads;
     }
 
-    public void setWrites(Queue<TroubleValueWrite> writes) {
+    public void setWrites(Queue<W> writes) {
         this.writes = writes;
     }
 
-    public Queue<TroubleValueRead> getReads() {
+    public Queue<R> getReads() {
         return reads;
     }
 
-    public Queue<TroubleValueWrite> getWrites() {
+    public Queue<W> getWrites() {
         return writes;
     }
 }

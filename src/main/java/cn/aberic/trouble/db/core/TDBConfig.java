@@ -24,6 +24,10 @@
 
 package cn.aberic.trouble.db.core;
 
+import org.apache.commons.lang3.StringUtils;
+
+import java.io.File;
+
 /**
  * @author Aberic on 2018/10/12 14:21
  * @version 1.0
@@ -32,11 +36,86 @@ package cn.aberic.trouble.db.core;
  */
 public class TDBConfig {
 
+    /** 默认区块文件前缀 */
+    private final static String TDB_BLOCK_FILE_START = "block_file_";
+    /** 默认区块文件后缀 */
+    private final static String TDB_BLOCK_FILE_END = ".block";
+    private final static String TDB_BLOCK_INDEX_NAME = "b_index";
+    private final static String TDB_KV_INDEX_NAME = "kv_index";
+    private final static String TDB_INDEX_END = ".tdb";
+    /** 默认区块文件存储路径 测试/生产 */
+    private final static String TROUBLE_DB_FILE_DIR = "/Users/Aberic/Documents/tmp/troubleDB/";
+    // private final static String TROUBLE_DB_FILE_DIR = "/data/trouble/troubleDB/";
+
     /** B-Tree的层 - n */
-    int treeMaxLevel = 0;
+    private int treeMaxLevel = 0;
     /** 结点范围对象中的所属子结点数组大小 - x */
-    int nodeArrayLength = 0;
+    private int nodeArrayLength = 0;
+    /** TDB数据库的默认存储目录 */
+    private String dbPath;
 
+    public static final String storageKVIndexFilePath(String dbPath, String tableName, int unit, int level, int rangeLevelDegree,
+                                                         int rangeDegree) {
+        if (StringUtils.isEmpty(dbPath)) {
+            dbPath = TROUBLE_DB_FILE_DIR;
+        }
+        return String.format("%s%s%s%s%s%s%s%s%s%s%s%s", dbPath, File.separator, TDB_KV_INDEX_NAME, File.separator,
+                unit, File.separator, level, File.separator, rangeLevelDegree, File.separator, rangeDegree,
+                TDB_INDEX_END);
+    }
 
+    /**
+     * 存储Key-Value映射关系
+     *
+     * @param dbPath           TDB数据库的默认存储目录
+     * @param unit             hash表的数组下标，此处即一级目录
+     * @param level            B-Tree的层级，此处即二级目录 - m
+     * @param rangeLevelDegree B-Tree结点范围对象在整层中的所在度，此处即三级目录 - v
+     * @param rangeDegree      B-Tree结点范围对象在上一级结点范围对象中所在度，此处即文件名称
+     *
+     * @return 索引文件路径
+     */
+    public static final String storageBlockIndexFilePath(String dbPath, String tableName, int unit, int level, int rangeLevelDegree,
+                                                         int rangeDegree) {
+        if (StringUtils.isEmpty(dbPath)) {
+            dbPath = TROUBLE_DB_FILE_DIR;
+        }
+        return String.format("%s%s%s%s%s%s%s%s%s%s%s%s", dbPath, File.separator, TDB_BLOCK_INDEX_NAME, File.separator,
+                unit, File.separator, level, File.separator, rangeLevelDegree, File.separator, rangeDegree,
+                TDB_INDEX_END);
+    }
+
+    public static final String storageBlockFilePath(String dbPath, String tableName, int unit, int level, int rangeLevelDegree,
+                                                    int rangeDegree) {
+        if (StringUtils.isEmpty(dbPath)) {
+            dbPath = TROUBLE_DB_FILE_DIR;
+        }
+        return String.format("%s%s%s%s%s%s%s%s%s%s%s%s%s", dbPath, File.separator, TDB_BLOCK_INDEX_NAME, File.separator,
+                unit, File.separator, level, File.separator, rangeLevelDegree, File.separator, TDB_BLOCK_FILE_START,
+                rangeDegree, TDB_BLOCK_FILE_END);
+    }
+
+    public TDBConfig setTree(int treeMaxLevel, int nodeArrayLength) {
+        this.treeMaxLevel = treeMaxLevel;
+        this.nodeArrayLength = nodeArrayLength;
+        return this;
+    }
+
+    public TDBConfig setDBPath(String dbPath) {
+        this.dbPath = dbPath;
+        return this;
+    }
+
+    public int getTreeMaxLevel() {
+        return treeMaxLevel;
+    }
+
+    public int getNodeArrayLength() {
+        return nodeArrayLength;
+    }
+
+    public String getDbPath() {
+        return dbPath;
+    }
 
 }

@@ -24,12 +24,8 @@
 
 package cn.aberic.trouble.db;
 
-import cn.aberic.trouble.db.block.TroubleBlock;
-import cn.aberic.trouble.db.core.TDBManager;
-import cn.aberic.trouble.db.core.TDBTable;
-import cn.aberic.trouble.db.util.HashTMap;
-
-import java.util.HashMap;
+import cn.aberic.trouble.db.core.TDBConfig;
+import cn.aberic.trouble.db.util.HashBlockMap;
 
 /**
  * @author Aberic on 2018/10/8 19:20
@@ -94,16 +90,16 @@ public class Test {
 
 // ====================================================================================================================================
 //
-        TDBManager<TroubleBlock> manager = new TDBManager<>();
-        manager.createTable("test");
-        TroubleBlock block = new TroubleBlock(null, null);
-        manager.put("test", 1, block);
-        manager.get("test", 1);
+//        TDBManager<TroubleBlock> manager = new TDBManager<>();
+//        manager.createTable("test");
+//        TroubleBlock block = new TroubleBlock(null, null);
+//        manager.put("test", 1, block);
+//        manager.get("test", 1);
         long startTime, estimatedTime;
-        HashTMap<Integer, Integer> map = new HashTMap<>(3, 100);
+//        HashTMap<Integer, Integer> map = new HashTMap<>(3, 100);
 //        HashIntegerMap<Integer> map = new HashIntegerMap<>();
 //        TTreeMap<Integer> map = new TTreeMap<>();
-        HashMap<Integer, Integer> hashMap = new HashMap<>();
+//        HashMap<Integer, Integer> hashMap = new HashMap<>();
 
 //        startTime = System.currentTimeMillis();
 //        for (int i = 1; i <= 20000000; i++) {
@@ -141,15 +137,15 @@ public class Test {
 
 // ====================================================================================================================================
 
-        for (int i = 1; i <= 5000000; i *= 3) {
-            map.put(i, i);
-        }
-        for (int i = 1; i <= 5000000; i *= 3) {
-            System.out.println("map.get(" + i + ") = " + map.get(i) + " | map.containsKey(" + i + ") = " + map.containsKey(i));
-        }
-        for (int i = 1; i <= 5000000; i *= 2) {
-            System.out.println("map.get(" + i + ") = " + map.get(i) + " | map.containsKey(" + i + ") = " + map.containsKey(i));
-        }
+//        for (int i = 1; i <= 5000000; i *= 3) {
+//            map.put(i, i);
+//        }
+//        for (int i = 1; i <= 5000000; i *= 3) {
+//            System.out.println("map.get(" + i + ") = " + map.get(i) + " | map.containsKey(" + i + ") = " + map.containsKey(i));
+//        }
+//        for (int i = 1; i <= 5000000; i *= 2) {
+//            System.out.println("map.get(" + i + ") = " + map.get(i) + " | map.containsKey(" + i + ") = " + map.containsKey(i));
+//        }
 
 // ====================================================================================================================================
 
@@ -167,11 +163,13 @@ public class Test {
 // ====================================================================================================================================
 
 
-//        HashStorageMap storageMap = new HashStorageMap();
-//        storageMap.get(1);
-//        storageMap.get(2);
-//        storageMap.get(3);
-//        storageMap.get(158);
+        TDBConfig config = new TDBConfig()
+                .setTree(3, 100);
+        HashBlockMap storageMap = new HashBlockMap("test",config);
+        storageMap.get(1);
+        storageMap.get(2);
+        storageMap.get(3);
+        storageMap.get(158);
 
 //        map.put(158, 158);
 //        map.put(157, "b");

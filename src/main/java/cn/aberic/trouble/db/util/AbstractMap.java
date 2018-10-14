@@ -24,6 +24,14 @@
 
 package cn.aberic.trouble.db.util;
 
+import cn.aberic.trouble.db.exception.BlockLineUnMatchException;
+import com.google.common.io.Files;
+
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.LineNumberReader;
+
 /**
  * 此类提供{@link Map}接口的骨干实现，以最大限度地减少实现此接口所需的工作。
  *
@@ -80,6 +88,7 @@ public abstract class AbstractMap<K, V> implements Map<K, V> {
      * @throws ClassCastException            {@inheritDoc}
      * @throws NullPointerException          {@inheritDoc}
      * @throws IllegalArgumentException      {@inheritDoc}
+     * @throws BlockLineUnMatchException     {@inheritDoc}
      */
     @Override
     public V put(int unit, int storeHash, K key, V value) {
@@ -93,5 +102,46 @@ public abstract class AbstractMap<K, V> implements Map<K, V> {
      * @return 此映射中包含的映射关系的Range视图
      */
     public abstract Range<K, V> range();
+
+    /**
+     * 获取一个文件对象，如果没有，则创建出来并获取
+     *
+     * @param filePath 文件完整路径及文件名
+     *
+     * @return 创建的文件
+     */
+    static final File file(String filePath) {
+        File file = new File(filePath);
+        if (!file.exists()) {
+            try {
+                Files.createParentDirs(file); // 创建新文件的父目录
+                if (!file.createNewFile()) { // 创建新文件
+                    throw new IOException("create new file fail");
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return file;
+    }
+
+    /**
+     * 获取文件中的总行数，适合单行内容较多较长的情况
+     *
+     * @param file 文件
+     *
+     * @return 文件总行数
+     */
+    static final int lines(File file) {
+        int lines = 0;
+        long fileLength = file.length();
+        try (LineNumberReader lineNumberReader = new LineNumberReader(new FileReader(file))) {
+            lineNumberReader.skip(fileLength);
+            lines = lineNumberReader.getLineNumber() + 1;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return lines;
+    }
 
 }

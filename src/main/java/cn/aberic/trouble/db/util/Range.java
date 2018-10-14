@@ -24,6 +24,8 @@
 
 package cn.aberic.trouble.db.util;
 
+import cn.aberic.trouble.db.exception.BlockLineUnMatchException;
+
 import java.util.Deque;
 import java.util.LinkedList;
 
@@ -130,7 +132,9 @@ abstract class Range<K, V> extends Pair {
      *
      * @param unit      传入key当前Hash数组中要访问的下标
      * @param storeHash 要测试此Range中是否存在的元素
+     *
      * @return 如果此Range包含指定的元素，则返回<tt>true</tt>
+     *
      * @throws ClassCastException   如果指定元素的类型与此Range不兼容（可选）
      * @throws NullPointerException 如果指定的元素为null并且此Range不允许null元素（可选）
      */
@@ -168,7 +172,9 @@ abstract class Range<K, V> extends Pair {
      *
      * @param unit 传入key当前Hash数组中要访问的下标
      * @param key  要返回其关联值的键
+     *
      * @return 指定键所映射的值；如果此映射不包含该键的映射关系，则返回{@code null}
+     *
      * @throws ClassCastException   如果该键对于此映射是不合适的类型（可选）
      * @throws NullPointerException 如果指定键为 null 并且此映射不允许 null 键（可选）
      */
@@ -204,8 +210,10 @@ abstract class Range<K, V> extends Pair {
      * @param unit  传入key当前Hash数组中要访问的下标
      * @param key   与指定值关联的键
      * @param value 与指定键关联的值
+     *
      * @return 以前与 <tt>key</tt> 关联的值，如果没有针对 <tt>key</tt> 的映射关系，则返回 <tt>null</tt> 。
      * （如果该实现支持 <tt>null</tt> 值，则返回 <tt>null</tt> 也可能表示此映射以前将 <tt>null</tt> 与 <tt>key</tt> 关联）
+     *
      * @throws UnsupportedOperationException 如果此映射不支持 <tt>put</tt> 操作
      * @throws ClassCastException            如果指定键或值的类不允许将其存储在此映射中
      * @throws NullPointerException          如果指定键或值为 <tt>null</tt> ，并且此映射不允许 <tt>null</tt> 键或值
@@ -216,6 +224,10 @@ abstract class Range<K, V> extends Pair {
         int v = calculateDegreeForOneLevelNow(storeHash, m); // 当前结点范围对象在整层度中的顺序位置
         int real = calculateReal(storeHash, m, v); // 当前key在B-Tree中的真实数字
         return putReal(real, key, value, m, v);
+    }
+
+    V putBlock(int unit, int storeHash, K key, V value) throws BlockLineUnMatchException {
+        return null;
     }
 
     private V putReal(int real, K key, V value, int m, int v) {
@@ -243,6 +255,7 @@ abstract class Range<K, V> extends Pair {
      * @param value  传入的value
      * @param m      结点范围对象所在B-Tree的层
      * @param v      结点范围对象在整层度中的顺序位置
+     *
      * @return 计划返回的是旧的值，如果有的话。当没有旧值的时候，就返回当前新存入的值
      */
     V putExec(Deque<Integer> vDeque, int real, K key, V value, int m, int v) {

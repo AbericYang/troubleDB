@@ -24,6 +24,9 @@
 
 package cn.aberic.trouble.db.util;
 
+import cn.aberic.trouble.db.block.TroubleBlock;
+import cn.aberic.trouble.db.core.TDBConfig;
+
 import java.io.Serializable;
 
 /**
@@ -32,46 +35,46 @@ import java.io.Serializable;
  * @see
  * @since 1.0
  */
-public class HashStorageMap<K, V> extends AbstractTMap<K, V> implements Serializable {
+public class HashBlockMap<K, V extends TroubleBlock> extends AbstractTMap<K, V> implements Serializable {
 
     private static final long serialVersionUID = 660419343050609348L;
 
-    private StorageTreeMap<K, V> storageTreeMap;
+    private BlockTreeMap<K, V> blockTreeMap;
 
-    public HashStorageMap() {
-        storageTreeMap = new StorageTreeMap<>();
-        treeMaxLength = storageTreeMap.range().treeMaxLength;
+    public HashBlockMap(String name) {
+        blockTreeMap = new BlockTreeMap<>(name);
+        treeMaxLength = blockTreeMap.range().treeMaxLength;
     }
 
-    public HashStorageMap(int treeMaxLevel, int nodeArrayLength) {
-        storageTreeMap = new StorageTreeMap<>(treeMaxLevel, nodeArrayLength);
-        treeMaxLength = storageTreeMap.range().treeMaxLength;
+    public HashBlockMap(String name, TDBConfig config) {
+        blockTreeMap = new BlockTreeMap<>(name, config);
+        treeMaxLength = blockTreeMap.range().treeMaxLength;
     }
 
     @Override
     public boolean containsKey(K key) {
         int hash = checkHashByKey(key);
         int unit = unit(hash);
-        return storageTreeMap.containsKey(unit, storeHash(hash, unit));
+        return blockTreeMap.containsKey(unit, storeHash(hash, unit));
     }
 
     @Override
     public V get(K key) {
         int hash = checkHashByKey(key);
         int unit = unit(hash);
-        return storageTreeMap.get(unit, storeHash(hash, unit), key);
+        return blockTreeMap.get(unit, storeHash(hash, unit), key);
     }
 
     @Override
     public V put(K key, V value) {
         int hash = checkHashByKey(key);
         int unit = unit(hash);
-        return storageTreeMap.put(unit, storeHash(hash, unit), key, value);
+        return blockTreeMap.put(unit, storeHash(hash, unit), key, value);
     }
 
     @Override
     int reHash(int hash) {
-        hash += storageTreeMap.range().treeMaxLength;
+        hash += blockTreeMap.range().treeMaxLength;
         if (hash < 0) {
             return reHash(hash);
         }

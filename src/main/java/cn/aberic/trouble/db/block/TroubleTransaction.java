@@ -65,7 +65,7 @@ import java.nio.charset.Charset;
  * @see TroubleBlockHeader
  * @since 1.0
  */
-public class TroubleTransaction {
+public class TroubleTransaction<T extends TroubleValueRWSet> {
 
     /** 本次写入值所用合约名称，序列化时不写入 */
     @JSONField(name = "n", serialize = false)
@@ -78,7 +78,7 @@ public class TroubleTransaction {
     private String creator;
     /** 交易读写集 */
     @JSONField(name = "rw")
-    private TroubleValueRWSet rwSet;
+    private T rwSet;
     /** 交易时间戳 */
     @JSONField(name = "t")
     private Long timestamp;
@@ -118,17 +118,41 @@ public class TroubleTransaction {
      * @param freshBlockTimestamp    最新区块的打包时间戳
      * @param freshBlockGetTimestamp 最新一个区块同步完成后的服务器时间戳
      */
-    public TroubleTransaction(String contractName, String contractVersion, String creator, TroubleValueRWSet rwSet, long freshBlockTimestamp, long freshBlockGetTimestamp) {
+    public TroubleTransaction(String contractName, String contractVersion, String creator, T rwSet, long freshBlockTimestamp, long freshBlockGetTimestamp) {
         this(contractName, contractVersion, creator, freshBlockTimestamp, freshBlockGetTimestamp);
         this.rwSet = rwSet;
     }
 
-    public void setRwSet(TroubleValueRWSet rwSet) {
+    public void setRwSet(T rwSet) {
         this.rwSet = rwSet;
     }
 
     public void setTransactionStatusCode(int transactionStatusCode) {
         this.transactionStatusCode = transactionStatusCode;
+    }
+
+    public String getContractName() {
+        return contractName;
+    }
+
+    public String getContractVersion() {
+        return contractVersion;
+    }
+
+    public String getCreator() {
+        return creator;
+    }
+
+    public T getRwSet() {
+        return rwSet;
+    }
+
+    public Long getTimestamp() {
+        return timestamp;
+    }
+
+    public String getTxHash() {
+        return txHash;
     }
 
     public TroubleTransaction build() {

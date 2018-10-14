@@ -24,26 +24,35 @@
 
 package cn.aberic.trouble.db.util;
 
-import java.io.Serializable;
+import cn.aberic.trouble.db.core.TDBConfig;
+import com.alibaba.fastjson.JSON;
+import com.google.common.base.Charsets;
+import com.google.common.io.FileWriteMode;
+import com.google.common.io.Files;
+
+import java.io.*;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * @author Aberic on 2018/10/11 23:29
- * @see HashTMap
+ * @author Aberic on 2018/10/14 20:41
+ * @see ClassLoader#defineClass(byte[], int, int)
  * @since 1.0
  */
-public class StorageTreeMap<K, V> extends AbstractMap<K, V> implements Map<K, V>, Serializable {
+public class IndexTreeMap<K, V> extends AbstractMap<K, V> implements Map<K, V>, Serializable {
 
     private static final long serialVersionUID = 5666542770113713739L;
 
     /** 当前结点范围对象的根对象，祖宗结点 */
     private StorageRange<K, V> root;
 
-    StorageTreeMap() {
-        root = new StorageRange<>();
+    IndexTreeMap(String name) {
+        root = new StorageRange<>(name);
     }
 
-    StorageTreeMap(int treeMaxLevel, int nodeArrayLength) {
-        root = new StorageRange<>(treeMaxLevel, nodeArrayLength);
+    IndexTreeMap(String name, TDBConfig config) {
+        root = new StorageRange<>(name, config);
     }
 
     @Override
@@ -53,12 +62,19 @@ public class StorageTreeMap<K, V> extends AbstractMap<K, V> implements Map<K, V>
 
     static class StorageRange<K, V> extends Range<K, V> {
 
-        StorageRange() {
+        private TDBConfig config;
+        private String name;
+
+        StorageRange(String name) {
             super();
+            this.name = name;
+            this.config = new TDBConfig();
         }
 
-        StorageRange(int treeMaxLevel, int nodeArrayLength) {
-            super(treeMaxLevel, nodeArrayLength);
+        StorageRange(String name, TDBConfig config) {
+            super(config.getTreeMaxLevel(), config.getNodeArrayLength());
+            this.name = name;
+            this.config = config;
         }
 
         /**
@@ -71,8 +87,10 @@ public class StorageTreeMap<K, V> extends AbstractMap<K, V> implements Map<K, V>
             int m = calculateLevelNow(storeHash); // 当前结点范围对象所在B-Tree的层
             int v = calculateDegreeForOneLevelNow(storeHash, m); // 当前结点范围对象在整层度中的顺序位置
             int real = calculateReal(storeHash, m, v); // 当前key在B-Tree中的真实数字
-            int minV = (int) ((real - (v - 1) * Math.pow(treeMaxDegree, m)) / Math.pow(treeMaxDegree, m - 1) - 1);
-//            System.out.println("y = " + treeMaxDegree + " | m = " + m + " | n = " + treeMaxLevel + " | v = " + v + " | minV = " + minV + " | key = " + key + " | real = " + real);
+            int rangeV = v - ((v - 1) / treeMaxDegree) * treeMaxDegree;
+            int minV = (int) ((real - (v - 1) * Math.pow(treeMaxDegree, m)) / Math.pow(treeMaxDegree, m - 1));
+//            System.out.println("y = " + treeMaxDegree + " | m = " + m + " | n = " + treeMaxLevel + " | v = " + v +
+//                    " | rangeV = " + rangeV + " | minV = " + minV + " | real = " + real);
             return false;
         }
 
@@ -86,8 +104,11 @@ public class StorageTreeMap<K, V> extends AbstractMap<K, V> implements Map<K, V>
             int m = calculateLevelNow(storeHash); // 当前结点范围对象所在B-Tree的层
             int v = calculateDegreeForOneLevelNow(storeHash, m); // 当前结点范围对象在整层度中的顺序位置
             int real = calculateReal(storeHash, m, v); // 当前key在B-Tree中的真实数字
-            int minV = (int) ((real - (v - 1) * Math.pow(treeMaxDegree, m)) / Math.pow(treeMaxDegree, m - 1) - 1);
-            System.out.println("y = " + treeMaxDegree + " | m = " + m + " | n = " + treeMaxLevel + " | v = " + v + " | minV = " + minV + " | key = " + key + " | real = " + real);
+            int rangeV = v - ((v - 1) / treeMaxDegree) * treeMaxDegree;
+            // B-Tree结点对象在结点范围对象中的度，此处即为存储行号
+            int minV = (int) ((real - (v - 1) * Math.pow(treeMaxDegree, m)) / Math.pow(treeMaxDegree, m - 1));
+            System.out.println("y = " + treeMaxDegree + " | m = " + m + " | n = " + treeMaxLevel + " | v = " + v +
+                    " | rangeV = " + rangeV + " | minV = " + minV + " | key = " + key + " | real = " + real);
             return null;
         }
 
@@ -101,11 +122,16 @@ public class StorageTreeMap<K, V> extends AbstractMap<K, V> implements Map<K, V>
             int m = calculateLevelNow(storeHash); // 当前结点范围对象所在B-Tree的层
             int v = calculateDegreeForOneLevelNow(storeHash, m); // 当前结点范围对象在整层度中的顺序位置
             int real = calculateReal(storeHash, m, v); // 当前key在B-Tree中的真实数字
-            int minV = (int) ((real - (v - 1) * Math.pow(treeMaxDegree, m)) / Math.pow(treeMaxDegree, m - 1) - 1);
-//            System.out.println("y = " + treeMaxDegree + " | m = " + m + " | n = " + treeMaxLevel + " | v = " + v + " | minV = " + minV + " | key = " + key + " | real = " + real);
+            int rangeV = v - ((v - 1) / treeMaxDegree) * treeMaxDegree;
+            // 结点对象在结点范围对象中的度，此处即为存储行号
+            int minV = (int) ((real - (v - 1) * Math.pow(treeMaxDegree, m)) / Math.pow(treeMaxDegree, m - 1));
+//            System.out.println("y = " + treeMaxDegree + " | m = " + m + " | n = " + treeMaxLevel + " | v = " + v +
+//                    " | rangeV = " + rangeV + " | minV = " + minV + " | key = " + key + " | real = " + real);
             return null;
         }
 
-    }
+        private void saveKVIndex() {
 
+        }
+    }
 }

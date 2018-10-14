@@ -25,51 +25,31 @@
 package cn.aberic.trouble.db.block;
 
 import com.alibaba.fastjson.annotation.JSONField;
-import com.google.common.hash.Hashing;
-
-import java.nio.charset.Charset;
 
 /**
- * <p>区块对象
- *
- * <p>区块文件中的最大单元，以换行符进行分隔。
- * 包含有区块头{@link TroubleBlockHeader}和区块体{@link TroubleBlockBody}两个成员。
- *
- * <p>在区块头中的当前区块hash由{@code TroubleBlock#calculateHash()}方法生成。
- *
- * @author Aberic on 2018/10/7 16:00
- * @see TroubleBlockHeader
- * @see TroubleBlockBody
+ * @author Aberic on 2018/10/14 14:49
+ * @see ClassLoader#defineClass(byte[], int, int)
  * @since 1.0
- * @version 1.0
  */
-public class TroubleBlock<H extends TroubleBlockHeader, B extends TroubleBlockBody> {
+public class BlockIndex {
 
-    /** 区块头部信息 */
-    @JSONField(name = "h")
-    private H header;
-    /** 区块数据体 */
-    @JSONField(name = "b")
-    private B body;
+    /** 区块所在区块文件编号 */
+    @JSONField(name = "n")
+    private int num;
+    /** 区块所在区块文件中的行号 */
+    @JSONField(name = "l")
+    private int line;
 
-    public TroubleBlock(H header, B body) {
-        this.header = header;
-        this.body = body;
+    public BlockIndex(int num, int line) {
+        this.num = num;
+        this.line = line;
     }
 
-    public H getHeader() {
-        return header;
+    public int getNum() {
+        return num;
     }
 
-    public B getBody() {
-        return body;
+    public int getLine() {
+        return line;
     }
-
-    /** 得到当前区块hash */
-    public String calculateHash() {
-        return Hashing.sha256().hashString(String.format("%s%s%s",
-                header.previousBlockHash, Long.toString(header.timestamp), body.bodyString()),
-                Charset.forName("UTF-8")).toString();
-    }
-
 }

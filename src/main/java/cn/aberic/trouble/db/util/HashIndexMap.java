@@ -22,43 +22,45 @@
  * SOFTWARE.
  */
 
-package cn.aberic.trouble.db.core;
+package cn.aberic.trouble.db.util;
 
-import cn.aberic.trouble.db.block.TroubleBlock;
-import cn.aberic.trouble.db.util.HashBlockMap;
-import cn.aberic.trouble.db.util.HashIndexMap;
+import cn.aberic.trouble.db.core.TDBConfig;
+
+import java.io.Serializable;
 
 /**
- * @author Aberic on 2018/10/12 14:38
- * @version 1.0
- * @see
+ * @author Aberic on 2018/10/14 20:39
+ * @see ClassLoader#defineClass(byte[], int, int)
  * @since 1.0
  */
-public class TDBManager<V extends TroubleBlock> {
+public class HashIndexMap<K, V> extends AbstractTMap<K, V> implements Serializable {
 
-    private HashIndexMap<String, TDBTable<Integer, V>> blockMap;
-    private HashIndexMap<String, TDITable> indexMap;
-    private TDBConfig config;
+    private static final long serialVersionUID = 8138886090168482947L;
 
-    public TDBManager() {
-        blockMap = new HashIndexMap<>("managerBlock");
-        config = new TDBConfig();
+    private IndexTreeMap<K, V> indexTreeMap;
+
+    public HashIndexMap(String name) {
+        indexTreeMap = new IndexTreeMap<>(name);
+        treeMaxLength = indexTreeMap.range().treeMaxLength;
     }
 
-    public void createTable(String name) {
-        blockMap.put(name, new TDBTable<>(name, config));
+    public HashIndexMap(String name, TDBConfig config) {
+        indexTreeMap = new IndexTreeMap<>(name, config);
+        treeMaxLength = indexTreeMap.range().treeMaxLength;
     }
 
-    public boolean containsKey(String name, int key) {
-        return blockMap.get(name).containsKey(key);
+    @Override
+    public boolean containsKey(K key) {
+        return false;
     }
 
-    public V get(String name, int key) {
-        return blockMap.get(name).get(key);
+    @Override
+    public V get(K key) {
+        return null;
     }
 
-    public V put(String name, int key, V value) {
-        return blockMap.get(name).put(key, value);
+    @Override
+    public V put(K key, V value) {
+        return null;
     }
-
 }

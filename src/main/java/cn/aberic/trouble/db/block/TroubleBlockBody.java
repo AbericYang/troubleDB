@@ -43,24 +43,24 @@ import java.util.List;
  * @see TroubleTransaction
  * @since 1.0
  */
-public class TroubleBlockBody {
+public class TroubleBlockBody<T extends TroubleTransaction> {
 
     /** 交易数量，序列化时不写入 */
     @JSONField(serialize = false)
     private int txCount;
     /** 交易集合 */
     @JSONField(name = "t")
-    private List<TroubleTransaction> transactions;
+    private List<T> transactions;
 
     public int getTxCount() {
         return null != transactions ? transactions.size() : 0;
     }
 
-    public List<TroubleTransaction> getTransactions() {
+    public List<T> getTransactions() {
         return transactions;
     }
 
-    public TroubleBlockBody(List<TroubleTransaction> transactions) {
+    public TroubleBlockBody(List<T> transactions) {
         this.transactions = transactions;
     }
 

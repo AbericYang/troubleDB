@@ -22,43 +22,19 @@
  * SOFTWARE.
  */
 
-package cn.aberic.trouble.db.core;
-
-import cn.aberic.trouble.db.block.TroubleBlock;
-import cn.aberic.trouble.db.util.HashBlockMap;
-import cn.aberic.trouble.db.util.HashIndexMap;
+package cn.aberic.trouble.db.exception;
 
 /**
- * @author Aberic on 2018/10/12 14:38
- * @version 1.0
- * @see
+ * @author Aberic on 2018/10/13 14:57
+ * @see ClassLoader#defineClass(byte[], int, int)
  * @since 1.0
  */
-public class TDBManager<V extends TroubleBlock> {
+public class BlockLineUnMatchException extends Exception {
 
-    private HashIndexMap<String, TDBTable<Integer, V>> blockMap;
-    private HashIndexMap<String, TDITable> indexMap;
-    private TDBConfig config;
+    private static final long serialVersionUID = -8700858245955098835L;
 
-    public TDBManager() {
-        blockMap = new HashIndexMap<>("managerBlock");
-        config = new TDBConfig();
-    }
-
-    public void createTable(String name) {
-        blockMap.put(name, new TDBTable<>(name, config));
-    }
-
-    public boolean containsKey(String name, int key) {
-        return blockMap.get(name).containsKey(key);
-    }
-
-    public V get(String name, int key) {
-        return blockMap.get(name).get(key);
-    }
-
-    public V put(String name, int key, V value) {
-        return blockMap.get(name).put(key, value);
+    public BlockLineUnMatchException(String message) {
+        super(message);
     }
 
 }

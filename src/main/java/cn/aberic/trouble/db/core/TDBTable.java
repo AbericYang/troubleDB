@@ -1,6 +1,7 @@
 package cn.aberic.trouble.db.core;
 
-import cn.aberic.trouble.db.util.HashStorageMap;
+import cn.aberic.trouble.db.block.TroubleBlock;
+import cn.aberic.trouble.db.util.HashBlockMap;
 
 /**
  * @author Aberic on 2018/10/12 12:03
@@ -8,12 +9,12 @@ import cn.aberic.trouble.db.util.HashStorageMap;
  * @see
  * @since 1.0
  */
-public class TDBTable<K, V> {
+public class TDBTable<K, V extends TroubleBlock> {
 
-    private HashStorageMap<K, V> map;
+    private HashBlockMap<K, V> map;
 
-    TDBTable(TDBConfig config) {
-        map = new HashStorageMap<>(config.treeMaxLevel, config.nodeArrayLength);
+    TDBTable(String name, TDBConfig config) {
+        map = new HashBlockMap<>(name, config);
     }
 
     boolean containsKey(K key) {
