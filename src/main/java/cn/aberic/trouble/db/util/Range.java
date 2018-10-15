@@ -24,8 +24,6 @@
 
 package cn.aberic.trouble.db.util;
 
-import cn.aberic.trouble.db.exception.BlockLineUnMatchException;
-
 import java.util.Deque;
 import java.util.LinkedList;
 
@@ -218,10 +216,6 @@ abstract class Range<K, V> extends Pair {
         int v = calculateDegreeForOneLevelNow(storeHash, m); // 当前结点范围对象在整层度中的顺序位置
         int real = calculateReal(storeHash, m, v); // 当前key在B-Tree中的真实数字
         return putReal(real, key, value, m, v);
-    }
-
-    V putBlock(int unit, int storeHash, K key, V value) throws BlockLineUnMatchException {
-        return null;
     }
 
     private V putReal(int real, K key, V value, int m, int v) {

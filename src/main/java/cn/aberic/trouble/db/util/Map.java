@@ -24,7 +24,6 @@
 
 package cn.aberic.trouble.db.util;
 
-import cn.aberic.trouble.db.exception.BlockLineUnMatchException;
 
 /**
  * 将键映射到值的对象。一个映射不能包含重复的键；每个键最多只能映射到一个值。
@@ -33,7 +32,7 @@ import cn.aberic.trouble.db.exception.BlockLineUnMatchException;
  * @version 1.0
  * @see AbstractTreeMap
  * @see TreeMemoryMap
- * @see TreeBlockMap
+ * @see TreeDiskMap
  * @since 1.0
  */
 public interface Map<K, V> {
@@ -80,9 +79,8 @@ public interface Map<K, V> {
      * @throws ClassCastException            如果指定键或值的类不允许将其存储在此映射中
      * @throws NullPointerException          如果指定键或值为 <tt>null</tt> ，并且此映射不允许 <tt>null</tt> 键或值
      * @throws IllegalArgumentException      如果指定键或值的某些属性不允许将其存储在此映射中
-     * @throws BlockLineUnMatchException     存入区块对象
      */
-    V put(int unit, int storeHash, K key, V value) throws BlockLineUnMatchException;
+    V put(int unit, int storeHash, K key, V value);
 
 //    /**
 //     * 从指定映射中将所有映射关系复制到此映射中（可选操作）。

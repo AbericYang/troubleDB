@@ -29,7 +29,6 @@ import cn.aberic.trouble.db.block.TroubleBlockBody;
 import cn.aberic.trouble.db.block.TroubleBlockHeader;
 import cn.aberic.trouble.db.core.TDConfig;
 import cn.aberic.trouble.db.core.TDManager;
-import cn.aberic.trouble.db.third.DBExec;
 
 import java.util.ArrayList;
 
@@ -149,15 +148,15 @@ public class Test {
 
 // ====================================================================================================================================
 
-//        for (int i = 1; i <= 5000000; i *= 3) {
-//            manager.putI("index", i, new TroubleBlock<>(new TroubleBlockHeader(), new TroubleBlockBody(new ArrayList())));
-//        }
-//        for (int i = 1; i <= 5000000; i *= 3) {
-//            System.out.println("map.getI(" + i + ") = " + manager.getI("index", i) + " | map.containsKey(" + i + ") = " + manager.containsIKey("index", i));
-//        }
-//        for (int i = 1; i <= 5000000; i *= 2) {
-//            System.out.println("map.getI(" + i + ") = " + manager.getI("index", i) + " | map.containsKey(" + i + ") = " + manager.containsIKey("index", i));
-//        }
+        for (int i = 1; i <= 5000000; i *= 3) {
+            manager.putI("index", i, new TroubleBlock<>(new TroubleBlockHeader(), new TroubleBlockBody(new ArrayList())));
+        }
+        for (int i = 1; i <= 5000000; i *= 3) {
+            System.out.println("map.getI(" + i + ") = " + manager.getI("index", i) + " | map.containsKey(" + i + ") = " + manager.containsIKey("index", i));
+        }
+        for (int i = 1; i <= 5000000; i *= 2) {
+            System.out.println("map.getI(" + i + ") = " + manager.getI("index", i) + " | map.containsKey(" + i + ") = " + manager.containsIKey("index", i));
+        }
 //        for (int i = 1; i <= 5000000; i *= 2) {
 //            System.out.println("map.getI(" + i + ") = " + manager.getI("index", i) + " | map.containsKey(" + i + ") = " + manager.containsIKey("index", i));
 //        }
@@ -185,15 +184,15 @@ public class Test {
 //            manager.putI("index", i, i);
 //        }
 //        System.out.println("耗时 = " + (System.currentTimeMillis() - startTime));
-
-        startTime = System.currentTimeMillis();
-        for (int i = 1; i <= 1000000; i++) {
-            if (i % 10000 == 0) {
-                System.out.println("i = " + i + " 耗时 = " + (System.currentTimeMillis() - startTime));
-            }
-            manager.getI("index", i);
-        }
-        System.out.println("耗时 = " + (System.currentTimeMillis() - startTime));
+//
+//        startTime = System.currentTimeMillis();
+//        for (int i = 1; i <= 1000000; i++) {
+//            if (i % 10000 == 0) {
+//                System.out.println("i = " + i + " 耗时 = " + (System.currentTimeMillis() - startTime));
+//            }
+//            manager.getI("index", i);
+//        }
+//        System.out.println("耗时 = " + (System.currentTimeMillis() - startTime));
 
 // ====================================================================================================================================
 

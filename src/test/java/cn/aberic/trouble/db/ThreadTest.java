@@ -22,19 +22,51 @@
  * SOFTWARE.
  */
 
-package cn.aberic.trouble.db.exception;
+package cn.aberic.trouble.db;
+
+import cn.aberic.trouble.db.core.TDConfig;
+import cn.aberic.trouble.db.core.TDManager;
 
 /**
- * @author Aberic on 2018/10/13 14:57
+ * @author Aberic on 2018/10/15 21:50
  * @see ClassLoader#defineClass(byte[], int, int)
  * @since 1.0
  */
-public class BlockLineUnMatchException extends Exception {
+public class ThreadTest {
 
-    private static final long serialVersionUID = -8700858245955098835L;
+    static class A {
 
-    public BlockLineUnMatchException(String message) {
-        super(message);
+        private TDManager manager;
+
+        public A() {
+            TDConfig config = new TDConfig()
+                    .setTree(3, 100);
+            manager = new TDManager(config);
+            // manager.createMTable("haha");
+            manager.createITable("index");
+        }
+
+        public void start() {
+            at.start();
+            bt.start();
+        }
+
+        private Thread at = new Thread(() -> {
+            for (int i = 0; i < 50; i++) {
+                System.out.println("map.putI(0) -> " + i + " = " + manager.putI("index", 1, i));
+            }
+        });
+
+        private Thread bt = new Thread(() -> {
+            for (int i = 0; i < 50; i++) {
+                System.out.println("map.getI(1) -> " + i + " = " + manager.getI("index", 1));
+            }
+        });
+    }
+
+    public static void main(String[] args) {
+        A a = new A();
+        a.start();
     }
 
 }

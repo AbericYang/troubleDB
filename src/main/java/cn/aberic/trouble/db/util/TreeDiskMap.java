@@ -34,6 +34,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.charset.Charset;
+import java.util.HashMap;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author Aberic on 2018/10/14 20:41
@@ -67,12 +70,15 @@ public class TreeDiskMap<K, V> extends AbstractTreeMap<K, V> implements Serializ
 
         StorageRange(String name) {
             super();
-            this.name = name;
-            this.config = new TDConfig();
+            init(name, new TDConfig());
         }
 
         StorageRange(String name, TDConfig config) {
             super(config.getTreeMaxLevel(), config.getNodeArrayLength());
+            init(name, config);
+        }
+
+        private void init(String name, TDConfig config) {
             this.name = name;
             this.config = config;
         }
@@ -123,8 +129,10 @@ public class TreeDiskMap<K, V> extends AbstractTreeMap<K, V> implements Serializ
         @Override
         V put(int unit, int storeHash, K key, V value) {
             Position position = position(unit, storeHash, key, value);
-            File file = file(TDConfig.storageIndexFilePath(config.getDbPath(), name, position.unit, position.level,
-                    position.rangeLevelDegree, position.rangeDegree, position.nodeDegree));
+            String path = TDConfig.storageIndexFilePath(config.getDbPath(), name, position.unit, position.level,
+                    position.rangeLevelDegree, position.rangeDegree, position.nodeDegree);
+            // if (fileHashMap.get(path))
+            File file = file(path);
             try {
                 Files.asCharSink(file, Charset.forName("UTF-8")).write(JSON.toJSONString(position.value));
             } catch (IOException e) {

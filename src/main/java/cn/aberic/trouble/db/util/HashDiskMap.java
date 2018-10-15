@@ -37,33 +37,33 @@ public class HashDiskMap<K, V> extends AbstractHashMap<K, V> implements Serializ
 
     private static final long serialVersionUID = 8138886090168482947L;
 
-    private TreeDiskMap<K, V> indexTreeMap;
+    private TreeDiskMap<K, V> treeDiskMap;
 
     public HashDiskMap(String name) {
-        indexTreeMap = new TreeDiskMap<>(name);
-        treeMaxLength = indexTreeMap.range().treeMaxLength;
+        treeDiskMap = new TreeDiskMap<>(name);
+        treeMaxLength = treeDiskMap.range().treeMaxLength;
     }
 
     public HashDiskMap(String name, TDConfig config) {
-        indexTreeMap = new TreeDiskMap<>(name, config);
-        treeMaxLength = indexTreeMap.range().treeMaxLength;
+        treeDiskMap = new TreeDiskMap<>(name, config);
+        treeMaxLength = treeDiskMap.range().treeMaxLength;
     }
 
     @Override
     public boolean containsKey(int hash, K key) {
         int unit = unit(hash);
-        return indexTreeMap.containsKey(unit, storeHash(hash, unit));
+        return treeDiskMap.containsKey(unit, storeHash(hash, unit));
     }
 
     @Override
     public V get(int hash, K key) {
         int unit = unit(hash);
-        return indexTreeMap.get(unit, storeHash(hash, unit), key);
+        return treeDiskMap.get(unit, storeHash(hash, unit), key);
     }
 
     @Override
     public V put(int hash, K key, V value) {
         int unit = unit(hash);
-        return indexTreeMap.put(unit, storeHash(hash, unit), key, value);
+        return treeDiskMap.put(unit, storeHash(hash, unit), key, value);
     }
 }

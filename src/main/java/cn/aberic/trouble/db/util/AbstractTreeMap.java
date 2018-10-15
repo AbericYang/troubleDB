@@ -24,7 +24,6 @@
 
 package cn.aberic.trouble.db.util;
 
-import cn.aberic.trouble.db.exception.BlockLineUnMatchException;
 import com.google.common.io.Files;
 
 import java.io.File;
@@ -88,7 +87,6 @@ public abstract class AbstractTreeMap<K, V> implements Map<K, V> {
      * @throws ClassCastException            {@inheritDoc}
      * @throws NullPointerException          {@inheritDoc}
      * @throws IllegalArgumentException      {@inheritDoc}
-     * @throws BlockLineUnMatchException     {@inheritDoc}
      */
     @Override
     public V put(int unit, int storeHash, K key, V value) {
@@ -110,7 +108,7 @@ public abstract class AbstractTreeMap<K, V> implements Map<K, V> {
      *
      * @return 创建的文件
      */
-    static final File file(String filePath) {
+    synchronized static final File file(String filePath) {
         File file = new File(filePath);
         if (!file.exists()) {
             try {
