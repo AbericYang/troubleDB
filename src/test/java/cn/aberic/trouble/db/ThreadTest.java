@@ -49,11 +49,18 @@ public class ThreadTest {
         public void start() {
             at.start();
             bt.start();
+            ct.start();
         }
 
         private Thread at = new Thread(() -> {
             for (int i = 0; i < 50; i++) {
                 System.out.println("map.putI(0) -> " + i + " = " + manager.putI("index", 1, i));
+            }
+        });
+
+        private Thread ct = new Thread(() -> {
+            for (int i = 0; i < 50; i++) {
+                System.out.println("map.putI(2) -> " + i + " = " + manager.putI("index", 1, i));
             }
         });
 

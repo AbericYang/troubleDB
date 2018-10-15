@@ -108,14 +108,12 @@ public abstract class AbstractTreeMap<K, V> implements Map<K, V> {
      *
      * @return 创建的文件
      */
-    synchronized static final File file(String filePath) {
+    static final File file(String filePath) {
         File file = new File(filePath);
         if (!file.exists()) {
             try {
                 Files.createParentDirs(file); // 创建新文件的父目录
-                if (!file.createNewFile()) { // 创建新文件
-                    throw new IOException("create new file fail");
-                }
+                file.createNewFile(); // 创建新文件
             } catch (IOException e) {
                 e.printStackTrace();
             }
