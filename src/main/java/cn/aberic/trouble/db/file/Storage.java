@@ -25,7 +25,7 @@
 //package cn.aberic.trouble.db.file;
 //
 //import cn.aberic.trouble.db.block.TroubleBlock;
-//import cn.aberic.trouble.db.util.BlockTreeMap;
+//import cn.aberic.trouble.db.util.TreeBlockMap;
 //
 ///**
 // * @author Aberic on 2018/10/7 23:01
@@ -34,11 +34,11 @@
 // */
 //public class Storage {
 //
-//    public static <T extends TroubleBlock> BlockTreeMap.NodeValue save(T t) throws Exception{
+//    public static <T extends TroubleBlock> TreeBlockMap.NodeValue save(T t) throws Exception{
 //        throw new Exception();
 //    }
 //
-//    public static <T extends TroubleBlock> T get(int num, int line) {
+//    public static <T extends TroubleBlock> T getM(int num, int line) {
 //        return null;
 //    }
 //

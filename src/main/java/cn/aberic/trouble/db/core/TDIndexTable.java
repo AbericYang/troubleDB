@@ -31,24 +31,24 @@ import cn.aberic.trouble.db.util.HashIndexMap;
  * @see ClassLoader#defineClass(byte[], int, int)
  * @since 1.0
  */
-public class TDITable {
+class TDIndexTable {
 
-    private HashIndexMap<Integer, String> map;
+    private HashIndexMap<Object, Object> map;
 
-    TDITable(String name, TDBConfig config) {
+    TDIndexTable(String name, TDConfig config) {
         map = new HashIndexMap<>(name, config);
     }
 
-    boolean containsKey(Integer key) {
-        return map.containsKey(key);
+    boolean containsKey(int hash, Object key) {
+        return map.containsKey(hash, key);
     }
 
-    String get(Integer key) {
-        return map.get(key);
+    Object get(int hash, Object key) {
+        return map.get(hash, key);
     }
 
-    String put(Integer key, String value) {
-        return map.put(key, value);
+    Object put(int hash, Object key, Object value) {
+        return map.put(hash, key, value);
     }
 
 }

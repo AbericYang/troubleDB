@@ -35,8 +35,8 @@ import java.util.LinkedList;
  * <p>B-tree中每一个层对象{@code Range}都包含至少一个映射项{@link Map.RangePair}，
  * 且两者内的泛型元素保持一致。
  *
- * @see AbstractMap
- * @see TTreeMap
+ * @see AbstractTreeMap
+ * @see TreeMemoryMap
  * @since 1.0
  */
 abstract class Range<K, V> extends Pair {
@@ -132,9 +132,7 @@ abstract class Range<K, V> extends Pair {
      *
      * @param unit      传入key当前Hash数组中要访问的下标
      * @param storeHash 要测试此Range中是否存在的元素
-     *
      * @return 如果此Range包含指定的元素，则返回<tt>true</tt>
-     *
      * @throws ClassCastException   如果指定元素的类型与此Range不兼容（可选）
      * @throws NullPointerException 如果指定的元素为null并且此Range不允许null元素（可选）
      */
@@ -172,9 +170,7 @@ abstract class Range<K, V> extends Pair {
      *
      * @param unit 传入key当前Hash数组中要访问的下标
      * @param key  要返回其关联值的键
-     *
      * @return 指定键所映射的值；如果此映射不包含该键的映射关系，则返回{@code null}
-     *
      * @throws ClassCastException   如果该键对于此映射是不合适的类型（可选）
      * @throws NullPointerException 如果指定键为 null 并且此映射不允许 null 键（可选）
      */
@@ -210,11 +206,9 @@ abstract class Range<K, V> extends Pair {
      * @param unit  传入key当前Hash数组中要访问的下标
      * @param key   与指定值关联的键
      * @param value 与指定键关联的值
-     *
      * @return 以前与 <tt>key</tt> 关联的值，如果没有针对 <tt>key</tt> 的映射关系，则返回 <tt>null</tt> 。
      * （如果该实现支持 <tt>null</tt> 值，则返回 <tt>null</tt> 也可能表示此映射以前将 <tt>null</tt> 与 <tt>key</tt> 关联）
-     *
-     * @throws UnsupportedOperationException 如果此映射不支持 <tt>put</tt> 操作
+     * @throws UnsupportedOperationException 如果此映射不支持 <tt>putM</tt> 操作
      * @throws ClassCastException            如果指定键或值的类不允许将其存储在此映射中
      * @throws NullPointerException          如果指定键或值为 <tt>null</tt> ，并且此映射不允许 <tt>null</tt> 键或值
      * @throws IllegalArgumentException      如果指定键或值的某些属性不允许将其存储在此映射中
@@ -246,7 +240,7 @@ abstract class Range<K, V> extends Pair {
 
     /**
      * 处理存入操作并获取存入结果返回值，并非强制重写。
-     * 该方法会在{@link TTreeMap}中进行重写，{@code TTreeMap}并非磁盘存储对象，而是内存缓存对象。
+     * 该方法会在{@link TreeMemoryMap}中进行重写，{@code TreeMemoryMap}并非磁盘存储对象，而是内存缓存对象。
      * 理论上，该方法仅内存缓存对象重写即可。
      *
      * @param vDeque 用于存放自下而上每一父结点范围对象在整层度中顺序位置的栈
@@ -255,11 +249,45 @@ abstract class Range<K, V> extends Pair {
      * @param value  传入的value
      * @param m      结点范围对象所在B-Tree的层
      * @param v      结点范围对象在整层度中的顺序位置
-     *
      * @return 计划返回的是旧的值，如果有的话。当没有旧值的时候，就返回当前新存入的值
      */
     V putExec(Deque<Integer> vDeque, int real, K key, V value, int m, int v) {
         return null;
+    }
+
+    final Position position(int unit, int storeHash, K key, V value) {
+        int m = calculateLevelNow(storeHash); // 当前结点范围对象所在B-Tree的层
+        int v = calculateDegreeForOneLevelNow(storeHash, m); // 当前结点范围对象在整层度中的顺序位置
+        int real = calculateReal(storeHash, m, v); // 当前key在B-Tree中的真实数字
+        int rangeV = v - ((v - 1) / treeMaxDegree) * treeMaxDegree;
+        // 结点对象在结点范围对象中的度，此处即为存储行号
+        int minV = (int) ((real - (v - 1) * Math.pow(treeMaxDegree, m)) / Math.pow(treeMaxDegree, m - 1));
+//            System.out.println("y = " + treeMaxDegree + " | m = " + m + " | n = " + treeMaxLevel + " | v = " + v +
+//                    " | rangeV = " + rangeV + " | minV = " + minV + " | key = " + key + " | real = " + real);
+        return new Position(unit, m, v, rangeV, minV, value);
+    }
+
+    class Position {
+        /** hash表的数组下标，此处即一级目录 */
+        int unit;
+        /** B-Tree的层级，此处即二级目录 - m */
+        int level;
+        /** B-Tree结点范围对象在整层中的所在度，此处即三级目录 - v */
+        int rangeLevelDegree;
+        /** B-Tree结点范围对象在上一级结点范围对象中所在度，此处即文件名称 */
+        int rangeDegree;
+        /** B-Tree结点对象在结点范围对象中的度，此处即为存储行号 */
+        int nodeDegree;
+        V value;
+
+        Position(int unit, int level, int rangeLevelDegree, int rangeDegree, int nodeDegree, V value) {
+            this.unit = unit;
+            this.level = level;
+            this.rangeLevelDegree = rangeLevelDegree;
+            this.rangeDegree = rangeDegree;
+            this.nodeDegree = nodeDegree;
+            this.value = value;
+        }
     }
 
 }

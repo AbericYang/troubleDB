@@ -41,7 +41,7 @@ public interface TMap<K, V> {
      * @throws ClassCastException   如果该键对于此映射是不合适的类型（可选）
      * @throws NullPointerException 如果指定键为 null 并且此映射不允许 null 键（可选）
      */
-    boolean containsKey(K key);
+    boolean containsKey(int hash, K key);
 
     /**
      * 返回指定键所映射的值；如果此映射不包含该键的映射关系，则返回{@code null}。
@@ -57,22 +57,22 @@ public interface TMap<K, V> {
      * @throws ClassCastException   如果该键对于此映射是不合适的类型（可选）
      * @throws NullPointerException 如果指定键为 null 并且此映射不允许 null 键（可选）
      */
-    V get(K key);
+    V get(int hash, K key);
 
     /**
      * 将指定的值与此映射中的指定键关联（可选操作）。
      * 如果此映射以前包含一个该键的映射关系，
-     * 则用指定值替换旧值（当且仅当{@link #containsKey(K) m.containsKey(k)}返回 <tt>true</tt> 时，
+     * 则用指定值替换旧值（当且仅当{@link #containsKey(int, K) m.containsMKey(k)}返回 <tt>true</tt> 时，
      * 才能说映射 <tt>m</tt> 包含键 <tt>k</tt> 的映射关系）。
      *
      * @param key   与指定值关联的键
      * @param value 与指定键关联的值
      * @return 以前与 <tt>key</tt> 关联的值，如果没有针对 <tt>key</tt> 的映射关系，则返回 <tt>null</tt> 。
      * （如果该实现支持 <tt>null</tt> 值，则返回 <tt>null</tt> 也可能表示此映射以前将 <tt>null</tt> 与 <tt>key</tt> 关联）
-     * @throws UnsupportedOperationException 如果此映射不支持 <tt>put</tt> 操作
+     * @throws UnsupportedOperationException 如果此映射不支持 <tt>putM</tt> 操作
      * @throws ClassCastException            如果指定键或值的类不允许将其存储在此映射中
      * @throws NullPointerException          如果指定键或值为 <tt>null</tt> ，并且此映射不允许 <tt>null</tt> 键或值
      * @throws IllegalArgumentException      如果指定键或值的某些属性不允许将其存储在此映射中
      */
-    V put(K key, V value);
+    V put(int hash, K key, V value);
 }

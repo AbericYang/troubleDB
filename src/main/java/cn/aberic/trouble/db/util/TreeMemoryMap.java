@@ -51,10 +51,10 @@ import java.util.HashMap;
  * v = (int - x(y^?))/x - 1(?)
  *
  * @author Aberic on 2018/10/8 22:07
- * @see HashTMap
+ * @see HashMemoryMap
  * @since 1.0
  */
-public class TTreeMap<K, V> extends AbstractMap<K, V> implements Map<K, V>, Serializable {
+public class TreeMemoryMap<K, V> extends AbstractTreeMap<K, V> implements Serializable {
 
     private static final long serialVersionUID = 8565247786674084606L;
 
@@ -73,11 +73,11 @@ public class TTreeMap<K, V> extends AbstractMap<K, V> implements Map<K, V>, Seri
      *
      * <p>持续分割会维持一个B+Tree的模型。
      */
-    TTreeMap() {
+    TreeMemoryMap() {
         root = new NodeRange<>();
     }
 
-    TTreeMap(int treeMaxLevel, int nodeArrayLength) {
+    TreeMemoryMap(int treeMaxLevel, int nodeArrayLength) {
         root = new NodeRange<>(treeMaxLevel, nodeArrayLength);
     }
 

@@ -24,8 +24,8 @@
 
 package cn.aberic.trouble.db;
 
-import cn.aberic.trouble.db.core.TDBConfig;
-import cn.aberic.trouble.db.util.HashBlockMap;
+import cn.aberic.trouble.db.core.TDConfig;
+import cn.aberic.trouble.db.core.TDManager;
 
 /**
  * @author Aberic on 2018/10/8 19:20
@@ -36,12 +36,12 @@ public class Test {
 
     public static void main(String[] args) {
 //        HashRangeMap<String, String> map = new HashRangeMap<>(1);
-//        map.put("1", "2");
-//        map.put("2", "2");
-//        map.put("3", "2");
-//        map.put("4", "2");
-//        map.put("5", "2");
-//        map.put("6", "2");
+//        map.putM("1", "2");
+//        map.putM("2", "2");
+//        map.putM("3", "2");
+//        map.putM("4", "2");
+//        map.putM("5", "2");
+//        map.putM("6", "2");
 
 //        String s1 = Integer.toHexString(1);
 //        String s2 = Integer.toHexString(100);
@@ -90,31 +90,37 @@ public class Test {
 
 // ====================================================================================================================================
 //
-//        TDBManager<TroubleBlock> manager = new TDBManager<>();
-//        manager.createTable("test");
+//        TDManager<TroubleBlock> manager = new TDManager<>();
+//        manager.createMTable("test");
 //        TroubleBlock block = new TroubleBlock(null, null);
-//        manager.put("test", 1, block);
-//        manager.get("test", 1);
+//        manager.putM("test", 1, block);
+//        manager.getM("test", 1);
+
+        TDConfig config = new TDConfig()
+                .setTree(3, 100);
         long startTime, estimatedTime;
-//        HashTMap<Integer, Integer> map = new HashTMap<>(3, 100);
+        TDManager manager = new TDManager(config);
+        // manager.createMTable("haha");
+        manager.createITable("index");
+        // HashMemoryMap<Integer, Integer> map = new HashMemoryMap<>(3, 100);
 //        HashIntegerMap<Integer> map = new HashIntegerMap<>();
-//        TTreeMap<Integer> map = new TTreeMap<>();
+//        TreeMemoryMap<Integer> map = new TreeMemoryMap<>();
 //        HashMap<Integer, Integer> hashMap = new HashMap<>();
 
 //        startTime = System.currentTimeMillis();
 //        for (int i = 1; i <= 20000000; i++) {
-//            map.put(i, i);
+//            map.putM(i, i);
 //        }
 //        estimatedTime = System.currentTimeMillis() - startTime;
-//        System.out.println("TTreeMap put 耗时 = " + estimatedTime);
+//        System.out.println("TreeMemoryMap putM 耗时 = " + estimatedTime);
 //
 //        startTime = System.currentTimeMillis();
 //        for (int i = 1; i <= 20000000; i++) {
-//            // System.out.println("map.get(" + i + ") = " + map.get(i));
-//            map.get(i);
+//            // System.out.println("map.getM(" + i + ") = " + map.getM(i));
+//            map.getM(i);
 //        }
 //        estimatedTime = System.currentTimeMillis() - startTime;
-//        System.out.println("TTreeMap get 耗时 = " + estimatedTime);
+//        System.out.println("TreeMemoryMap getM 耗时 = " + estimatedTime);
 //        System.out.println("map.size() = " + map.size());
 //        System.out.println("map.isEmpty() = " + map.isEmpty());
 //
@@ -122,67 +128,60 @@ public class Test {
 //
 //        startTime = System.currentTimeMillis();
 //        for (int i = 1; i <= 20000000; i++) {
-//            hashMap.put(i, i);
+//            hashMap.putM(i, i);
 //        }
 //        estimatedTime = System.currentTimeMillis() - startTime;
-//        System.out.println("HashMap put 耗时 = " + estimatedTime);
+//        System.out.println("HashMap putM 耗时 = " + estimatedTime);
 //
 //        startTime = System.currentTimeMillis();
 //        for (int i = 1; i <= 20000000; i++) {
-//            // System.out.println("map.get(" + i + ") = " + map.get(i));
-//            hashMap.get(i);
+//            // System.out.println("map.getM(" + i + ") = " + map.getM(i));
+//            hashMap.getM(i);
 //        }
 //        estimatedTime = System.currentTimeMillis() - startTime;
-//        System.out.println("HashMap get 耗时 = " + estimatedTime);
+//        System.out.println("HashMap getM 耗时 = " + estimatedTime);
 
 // ====================================================================================================================================
 
-//        for (int i = 1; i <= 5000000; i *= 3) {
-//            map.put(i, i);
-//        }
-//        for (int i = 1; i <= 5000000; i *= 3) {
-//            System.out.println("map.get(" + i + ") = " + map.get(i) + " | map.containsKey(" + i + ") = " + map.containsKey(i));
-//        }
+        for (int i = 1; i <= 5000000; i *= 3) {
+            manager.putI("index", i, i);
+        }
+        for (int i = 1; i <= 5000000; i *= 3) {
+            System.out.println("map.getI(" + i + ") = " + manager.getI("index", i) + " | map.containsKey(" + i + ") = " + manager.containsIKey("index", i));
+        }
 //        for (int i = 1; i <= 5000000; i *= 2) {
-//            System.out.println("map.get(" + i + ") = " + map.get(i) + " | map.containsKey(" + i + ") = " + map.containsKey(i));
+//            System.out.println("map.getI(" + i + ") = " + manager.getI("index", i) + " | map.containsKey(" + i + ") = " + manager.containsIKey("index", i));
 //        }
 
 // ====================================================================================================================================
 
 
 //        for (int i = 1; i <= 5000000; i*=3) {
-//            map.put(i + "a", i);
+//            map.putM(i + "a", i);
 //        }
 //        for (int i = 1; i <= 5000000; i*=3) {
-//            System.out.println("map.get(" + i + ") = " + map.get(i + "a") + " | map.containsKey(" + i + ") = " + map.containsKey(i + "a"));
+//            System.out.println("map.getM(" + i + ") = " + map.getM(i + "a") + " | map.containsMKey(" + i + ") = " + map.containsMKey(i + "a"));
 //        }
 //        for (int i = 1; i <= 5000000; i*=2) {
-//            System.out.println("map.get(" + i + ") = " + map.get(i + "a") + " | map.containsKey(" + i + ") = " + map.containsKey(i + "a"));
+//            System.out.println("map.getM(" + i + ") = " + map.getM(i + "a") + " | map.containsMKey(" + i + ") = " + map.containsMKey(i + "a"));
 //        }
 
 // ====================================================================================================================================
 
 
-        TDBConfig config = new TDBConfig()
-                .setTree(3, 100);
-        HashBlockMap storageMap = new HashBlockMap("test",config);
-        storageMap.get(1);
-        storageMap.get(2);
-        storageMap.get(3);
-        storageMap.get(158);
 
-//        map.put(158, 158);
-//        map.put(157, "b");
-//        map.put(158, "c");
-//        map.put(159, "d");
-//        map.put(160, "e");
+//        map.putM(158, 158);
+//        map.putM(157, "b");
+//        map.putM(158, "c");
+//        map.putM(159, "d");
+//        map.putM(160, "e");
 //
 //        System.out.println();
-//        System.out.println("map.get(148) = " + map.get(148));
-//        System.out.println("map.get(157) = " + map.get(157));
-//        System.out.println("map.get(158) = " + map.get(158));
-//        System.out.println("map.get(159) = " + map.get(159));
-//        System.out.println("map.get(160) = " + map.get(160));
+//        System.out.println("map.getM(148) = " + map.getM(148));
+//        System.out.println("map.getM(157) = " + map.getM(157));
+//        System.out.println("map.getM(158) = " + map.getM(158));
+//        System.out.println("map.getM(159) = " + map.getM(159));
+//        System.out.println("map.getM(160) = " + map.getM(160));
 
 //        System.out.println("1 / 4 = " + 1 / 4);
 //        System.out.println("3 / 4 = " + 3 / 4);
@@ -195,7 +194,6 @@ public class Test {
      * 补位符 - z -zi
      *
      * @param i
-     *
      * @return
      */
     private static String getIntHash(int i) {
@@ -259,7 +257,6 @@ public class Test {
      * ---------------------------------------------------------------
      *
      * @param str
-     *
      * @return
      */
     private static String encode(String str) {

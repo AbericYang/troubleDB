@@ -24,6 +24,8 @@
 
 package cn.aberic.trouble.db.util;
 
+import cn.aberic.trouble.db.core.TDConfig;
+
 import java.io.Serializable;
 import java.util.Arrays;
 
@@ -32,7 +34,7 @@ import java.util.Arrays;
  * @see ClassLoader#defineClass(byte[], int, int)
  * @since 1.0
  */
-public class HashTMap<K, V> extends AbstractTMap<K, V> implements Serializable {
+public class HashMemoryMap<K, V> extends AbstractHashMap<K, V> implements Serializable {
 
     private static final long serialVersionUID = 2794796425862934413L;
 
@@ -45,27 +47,27 @@ public class HashTMap<K, V> extends AbstractTMap<K, V> implements Serializable {
     /** 构造哈希表数组检测用大小，始终比{@code #hashArrayLength}小1 */
     private int hashArrayCheckLength;
     /** 有序存储于哈希表中的B-tree */
-    private TTreeMap<K, V>[] treeMaps;
+    private TreeMemoryMap<K, V>[] treeMaps;
 
-    public HashTMap() {
+    public HashMemoryMap() {
         this(DEFAULT_HASH_LENGTH, 0 , 0);
     }
 
-    public HashTMap(int treeMaxLevel, int nodeArrayLength) {
-        this(DEFAULT_HASH_LENGTH, treeMaxLevel, nodeArrayLength);
+    public HashMemoryMap(TDConfig config) {
+        this(DEFAULT_HASH_LENGTH, config.getTreeMaxLevel(), config.getNodeArrayLength());
     }
 
     @SuppressWarnings("unchecked")
-    private HashTMap(int hashArrayLength, int treeMaxLevel, int nodeArrayLength) {
+    private HashMemoryMap(int hashArrayLength, int treeMaxLevel, int nodeArrayLength) {
         if (hashArrayLength <= 0) {
             this.hashArrayLength = DEFAULT_HASH_LENGTH;
         } else {
             this.hashArrayLength = hashArrayLength;
         }
         this.hashArrayCheckLength = hashArrayLength - 1;
-        treeMaps = new TTreeMap[this.hashArrayLength];
+        treeMaps = new TreeMemoryMap[this.hashArrayLength];
         for (int i = 0; i < this.hashArrayLength; i++) {
-            TTreeMap<K, V> treeMap = new TTreeMap<>(treeMaxLevel, nodeArrayLength);
+            TreeMemoryMap<K, V> treeMap = new TreeMemoryMap<>(treeMaxLevel, nodeArrayLength);
             treeMaps[i] = treeMap;
         }
         treeMaxLength = treeMaps[0].range().treeMaxLength;
@@ -98,8 +100,7 @@ public class HashTMap<K, V> extends AbstractTMap<K, V> implements Serializable {
      * @return {@inheritDoc}
      */
     @Override
-    public boolean containsKey(K key) {
-        int hash = checkHashByKey(key);
+    public boolean containsKey(int hash, K key) {
         int unit = unit(hash);
         if (unit > hashArrayCheckLength) {
             return false;
@@ -113,8 +114,7 @@ public class HashTMap<K, V> extends AbstractTMap<K, V> implements Serializable {
      * @return {@inheritDoc}
      */
     @Override
-    public V get(K key) {
-        int hash = checkHashByKey(key);
+    public V get(int hash, K key) {
         int unit = unit(hash);
         if (unit > hashArrayCheckLength) {
             return null;
@@ -128,11 +128,10 @@ public class HashTMap<K, V> extends AbstractTMap<K, V> implements Serializable {
      * @return {@inheritDoc}
      */
     @Override
-    public V put(K key, V value) {
+    public V put(int hash, K key, V value) {
         if (null == key) {
             throw new NullPointerException();
         }
-        int hash = checkHashByKey(key);
         int unit = unit(hash);
         if (unit > hashArrayCheckLength) {
             resize(unit);
@@ -151,8 +150,8 @@ public class HashTMap<K, V> extends AbstractTMap<K, V> implements Serializable {
         hashArrayLength += DEFAULT_LOAD_FACTOR;
         hashArrayCheckLength = hashArrayLength - 1;
         treeMaps = Arrays.copyOf(treeMaps, hashArrayLength);
-        treeMaps[hashArrayLength - 1] = new TTreeMap<>();
-        treeMaps[hashArrayLength - 2] = new TTreeMap<>();
+        treeMaps[hashArrayLength - 1] = new TreeMemoryMap<>();
+        treeMaps[hashArrayLength - 2] = new TreeMemoryMap<>();
         if (unit > hashArrayCheckLength) {
             resize(unit);
         }

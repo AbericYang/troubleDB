@@ -37,15 +37,15 @@ import java.io.LineNumberReader;
  *
  * @author Aberic on 2018/10/08 09:50
  * @version 1.0
- * @see TTreeMap
+ * @see TreeMemoryMap
  * @since 1.0
  */
-public abstract class AbstractMap<K, V> implements Map<K, V> {
+public abstract class AbstractTreeMap<K, V> implements Map<K, V> {
 
     /**
      * 唯一的构造方法。（由子类构造方法调用，通常是隐式的。）
      */
-    AbstractMap() {}
+    AbstractTreeMap() {}
 
     /**
      * {@inheritDoc}
@@ -56,9 +56,9 @@ public abstract class AbstractMap<K, V> implements Map<K, V> {
      * 如果找到这样的条目，则返回 <tt>true</tt> 。
      * 如果分裂终止，并且没有找到这样的条目，则返回 <tt>false</tt> 。
      *
-     * <p>注意，此实现所需的时间与{@code #get(Object)}方法所需时间相比有两种情况，
-     * 1、如果是值映射入内存，则与{@code #get(Object)}方法时间一致。
-     * 2、如果是区块内容查询，则值被映射到本地磁盘中，则比{@code #get(Object)}方法所花费的时间要更短。
+     * <p>注意，此实现所需的时间与{@code #getM(Object)}方法所需时间相比有两种情况，
+     * 1、如果是值映射入内存，则与{@code #getM(Object)}方法时间一致。
+     * 2、如果是区块内容查询，则值被映射到本地磁盘中，则比{@code #getM(Object)}方法所花费的时间要更短。
      */
     @Override
     public boolean containsKey(int unit, int storeHash) { return range().contains(unit, storeHash); }
@@ -72,9 +72,9 @@ public abstract class AbstractMap<K, V> implements Map<K, V> {
      * 如果找到这样的条目，则返回该条目的值。
      * 如果分裂终止，并且没有找到这样的条目，则返回 <tt>null</tt> 。
      *
-     * <p>注意，此实现所需的时间与{@code #containsKey(Object)}方法所需时间相比有两种情况，
-     * 1、如果是值映射入内存，则与{@code #containsKey(Object)}方法时间一致。
-     * 2、如果是区块内容查询，则值被映射到本地磁盘中，则比{@code #containsKey(Object)}方法所花费的时间要更长。
+     * <p>注意，此实现所需的时间与{@code #containsMKey(Object)}方法所需时间相比有两种情况，
+     * 1、如果是值映射入内存，则与{@code #containsMKey(Object)}方法时间一致。
+     * 2、如果是区块内容查询，则值被映射到本地磁盘中，则比{@code #containsMKey(Object)}方法所花费的时间要更长。
      */
     @Override
     public V get(int unit, int storeHash, K key) {
@@ -123,6 +123,11 @@ public abstract class AbstractMap<K, V> implements Map<K, V> {
             }
         }
         return file;
+    }
+
+    static final boolean fileExist(String filePath) {
+        File file = new File(filePath);
+        return file.exists();
     }
 
     /**

@@ -31,9 +31,9 @@ import cn.aberic.trouble.db.exception.BlockLineUnMatchException;
  *
  * @author Aberic on 2018/10/08 15:38
  * @version 1.0
- * @see AbstractMap
- * @see TTreeMap
- * @see BlockTreeMap
+ * @see AbstractTreeMap
+ * @see TreeMemoryMap
+ * @see TreeBlockMap
  * @since 1.0
  */
 public interface Map<K, V> {
@@ -69,14 +69,14 @@ public interface Map<K, V> {
     /**
      * 将指定的值与此映射中的指定键关联（可选操作）。
      * 如果此映射以前包含一个该键的映射关系，
-     * 则用指定值替换旧值（当且仅当{@link #containsKey(int, int) m.containsKey(k)}返回 <tt>true</tt> 时，
+     * 则用指定值替换旧值（当且仅当{@link #containsKey(int, int) m.containsMKey(k)}返回 <tt>true</tt> 时，
      * 才能说映射 <tt>m</tt> 包含键 <tt>k</tt> 的映射关系）。
      *
      * @param key   与指定值关联的键
      * @param value 与指定键关联的值
      * @return 以前与 <tt>key</tt> 关联的值，如果没有针对 <tt>key</tt> 的映射关系，则返回 <tt>null</tt> 。
      * （如果该实现支持 <tt>null</tt> 值，则返回 <tt>null</tt> 也可能表示此映射以前将 <tt>null</tt> 与 <tt>key</tt> 关联）
-     * @throws UnsupportedOperationException 如果此映射不支持 <tt>put</tt> 操作
+     * @throws UnsupportedOperationException 如果此映射不支持 <tt>putM</tt> 操作
      * @throws ClassCastException            如果指定键或值的类不允许将其存储在此映射中
      * @throws NullPointerException          如果指定键或值为 <tt>null</tt> ，并且此映射不允许 <tt>null</tt> 键或值
      * @throws IllegalArgumentException      如果指定键或值的某些属性不允许将其存储在此映射中
@@ -87,7 +87,7 @@ public interface Map<K, V> {
 //    /**
 //     * 从指定映射中将所有映射关系复制到此映射中（可选操作）。
 //     * 对于指定映射中的每个键 <tt>k</tt> 到值 <tt>v</tt> 的映射关系，
-//     * 此调用等效于对此映射调用一次{@link #put(Object, Object) put(k, v)}。
+//     * 此调用等效于对此映射调用一次{@link #putM(Object, Object) putM(k, v)}。
 //     * 如果正在进行此操作的同时修改了指定的映射，则此操作的行为是不确定的。
 //     *
 //     * @param m 要存储在此映射中的映射关系
@@ -102,7 +102,7 @@ public interface Map<K, V> {
      * 映射项（键-值对）。
      * <tt>RangeTreeMap.range</tt> 方法返回属于此类元素的映射视图。
      *
-     * @see TTreeMap#range()
+     * @see TreeMemoryMap#range()
      * @see Range
      * @since 1.0
      */
@@ -130,7 +130,7 @@ public interface Map<K, V> {
          *
          * @param v 要存储在此项中的新值
          * @return 与此项对应的旧值
-         * @throws UnsupportedOperationException 如果此映射不支持 <tt>put</tt> 操作
+         * @throws UnsupportedOperationException 如果此映射不支持 <tt>putM</tt> 操作
          * @throws ClassCastException            如果指定值的类不允许将其存储在底层映射中
          * @throws NullPointerException          如果底层映射不允许值为 <tt>null</tt> ，并且指定的值为 <tt>null</tt>
          * @throws IllegalArgumentException      如果此值的某些方面不允许将其存储在底层映射中

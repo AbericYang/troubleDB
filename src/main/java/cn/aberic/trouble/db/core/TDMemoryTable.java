@@ -24,41 +24,32 @@
 
 package cn.aberic.trouble.db.core;
 
-import cn.aberic.trouble.db.block.TroubleBlock;
-import cn.aberic.trouble.db.util.HashBlockMap;
-import cn.aberic.trouble.db.util.HashIndexMap;
+import cn.aberic.trouble.db.util.HashMemoryMap;
 
 /**
- * @author Aberic on 2018/10/12 14:38
+ * @author Aberic on 2018/10/15 10:48
  * @version 1.0
  * @see
  * @since 1.0
  */
-public class TDBManager<V extends TroubleBlock> {
+public class TDMemoryTable {
 
-    private HashIndexMap<String, TDBTable<Integer, V>> blockMap;
-    private HashIndexMap<String, TDITable> indexMap;
-    private TDBConfig config;
+    private HashMemoryMap<Object, Object> map;
 
-    public TDBManager() {
-        blockMap = new HashIndexMap<>("managerBlock");
-        config = new TDBConfig();
+    TDMemoryTable(String name, TDConfig config) {
+        map = new HashMemoryMap<>(config);
     }
 
-    public void createTable(String name) {
-        blockMap.put(name, new TDBTable<>(name, config));
+    boolean containsKey(int hash, Object key) {
+        return map.containsKey(hash, key);
     }
 
-    public boolean containsKey(String name, int key) {
-        return blockMap.get(name).containsKey(key);
+    Object get(int hash, Object key) {
+        return map.get(hash, key);
     }
 
-    public V get(String name, int key) {
-        return blockMap.get(name).get(key);
-    }
-
-    public V put(String name, int key, V value) {
-        return blockMap.get(name).put(key, value);
+    Object put(int hash, Object key, Object value) {
+        return map.put(hash, key, value);
     }
 
 }
