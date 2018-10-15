@@ -35,7 +35,7 @@ import java.util.HashMap;
 public class TDManager {
 
     private HashMap<String, TDMemoryTable> tdmMap;
-    private HashMap<String, TDIndexTable> tdiMap;
+    private HashMap<String, TDDiskTable> tdiMap;
     private TDConfig config;
 
     public TDManager() {
@@ -55,7 +55,7 @@ public class TDManager {
     }
 
     public void createITable(String name) {
-        tdiMap.put(name, new TDIndexTable(name, config));
+        tdiMap.put(name, new TDDiskTable(name, config));
     }
 
     public boolean containsMKey(String name, int key) {
@@ -63,6 +63,9 @@ public class TDManager {
     }
 
     public boolean containsIKey(String name, int key) {
+        if (null == tdiMap.get(name)) {
+            tdiMap.put(name, new TDDiskTable(name, config));
+        }
         return tdiMap.get(name).containsKey(checkHashByKey(key), key);
     }
 
@@ -71,6 +74,9 @@ public class TDManager {
     }
 
     public Object getI(String name, Object key) {
+        if (null == tdiMap.get(name)) {
+            tdiMap.put(name, new TDDiskTable(name, config));
+        }
         return tdiMap.get(name).get(checkHashByKey(key), key);
     }
 
@@ -79,6 +85,9 @@ public class TDManager {
     }
 
     public Object putI(String name, Object key, Object value) {
+        if (null == tdiMap.get(name)) {
+            tdiMap.put(name, new TDDiskTable(name, config));
+        }
         return tdiMap.get(name).put(checkHashByKey(key), key, value);
     }
 

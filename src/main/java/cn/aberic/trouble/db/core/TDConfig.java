@@ -65,13 +65,13 @@ public class TDConfig {
      * @return 索引文件路径
      */
     public static final String storageIndexFilePath(String dbPath, String tableName, int unit, int level,
-                                                    int rangeLevelDegree, int rangeDegree) {
+                                                    int rangeLevelDegree, int rangeDegree, int nodeDegree) {
         if (StringUtils.isEmpty(dbPath)) {
             dbPath = TROUBLE_DB_FILE_DIR;
         }
-        return String.format("%s%s%s%s%s%s%s%s%s%s%s%s%s%s", dbPath, File.separator, tableName, File.separator,
+        return String.format("%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s", dbPath, File.separator, tableName, File.separator,
                 TDB_INDEX_NAME, File.separator, unit, File.separator, level, File.separator, rangeLevelDegree,
-                File.separator, rangeDegree, TDB_INDEX_END);
+                File.separator, rangeDegree, File.separator, nodeDegree, TDB_INDEX_END);
     }
 
     public static final String storageBlockFilePath(String dbPath, String tableName, int unit, int level,

@@ -22,48 +22,33 @@
  * SOFTWARE.
  */
 
-package cn.aberic.trouble.db.util;
+package cn.aberic.trouble.db.core;
 
-import cn.aberic.trouble.db.core.TDConfig;
-
-import java.io.Serializable;
+import cn.aberic.trouble.db.util.HashDiskMap;
 
 /**
- * @author Aberic on 2018/10/14 20:39
+ * @author Aberic on 2018/10/14 20:48
  * @see ClassLoader#defineClass(byte[], int, int)
  * @since 1.0
  */
-public class HashIndexMap<K, V> extends AbstractHashMap<K, V> implements Serializable {
+class TDDiskTable {
 
-    private static final long serialVersionUID = 8138886090168482947L;
+    private HashDiskMap<Object, Object> map;
 
-    private TreeIndexMap<K, V> indexTreeMap;
-
-    public HashIndexMap(String name) {
-        indexTreeMap = new TreeIndexMap<>(name);
-        treeMaxLength = indexTreeMap.range().treeMaxLength;
+    TDDiskTable(String name, TDConfig config) {
+        map = new HashDiskMap<>(name, config);
     }
 
-    public HashIndexMap(String name, TDConfig config) {
-        indexTreeMap = new TreeIndexMap<>(name, config);
-        treeMaxLength = indexTreeMap.range().treeMaxLength;
+    boolean containsKey(int hash, Object key) {
+        return map.containsKey(hash, key);
     }
 
-    @Override
-    public boolean containsKey(int hash, K key) {
-        int unit = unit(hash);
-        return indexTreeMap.containsKey(unit, storeHash(hash, unit));
+    Object get(int hash, Object key) {
+        return map.get(hash, key);
     }
 
-    @Override
-    public V get(int hash, K key) {
-        int unit = unit(hash);
-        return indexTreeMap.get(unit, storeHash(hash, unit), key);
+    Object put(int hash, Object key, Object value) {
+        return map.put(hash, key, value);
     }
 
-    @Override
-    public V put(int hash, K key, V value) {
-        int unit = unit(hash);
-        return indexTreeMap.put(unit, storeHash(hash, unit), key, value);
-    }
 }

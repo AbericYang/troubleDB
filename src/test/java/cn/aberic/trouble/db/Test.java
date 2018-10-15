@@ -24,8 +24,13 @@
 
 package cn.aberic.trouble.db;
 
+import cn.aberic.trouble.db.block.TroubleBlock;
+import cn.aberic.trouble.db.block.TroubleBlockBody;
+import cn.aberic.trouble.db.block.TroubleBlockHeader;
 import cn.aberic.trouble.db.core.TDConfig;
 import cn.aberic.trouble.db.core.TDManager;
+
+import java.util.ArrayList;
 
 /**
  * @author Aberic on 2018/10/8 19:20
@@ -144,9 +149,12 @@ public class Test {
 // ====================================================================================================================================
 
         for (int i = 1; i <= 5000000; i *= 3) {
-            manager.putI("index", i, i);
+            manager.putI("index", i, new TroubleBlock<>(new TroubleBlockHeader(), new TroubleBlockBody(new ArrayList())));
         }
         for (int i = 1; i <= 5000000; i *= 3) {
+            System.out.println("map.getI(" + i + ") = " + manager.getI("index", i) + " | map.containsKey(" + i + ") = " + manager.containsIKey("index", i));
+        }
+        for (int i = 1; i <= 5000000; i *= 2) {
             System.out.println("map.getI(" + i + ") = " + manager.getI("index", i) + " | map.containsKey(" + i + ") = " + manager.containsIKey("index", i));
         }
 //        for (int i = 1; i <= 5000000; i *= 2) {
