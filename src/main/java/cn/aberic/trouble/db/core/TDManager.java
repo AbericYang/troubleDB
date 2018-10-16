@@ -24,6 +24,8 @@
 
 package cn.aberic.trouble.db.core;
 
+import cn.aberic.trouble.db.block.TroubleBlock;
+
 import java.util.HashMap;
 
 /**
@@ -34,50 +36,81 @@ import java.util.HashMap;
  */
 public class TDManager {
 
+    private static volatile TDManager instance;
+
     private HashMap<String, TDMemoryTable> tdmMap;
-    private HashMap<String, TDDiskTable> tdiMap;
+    private HashMap<String, TDDiskTable> tddMap;
+    private HashMap<String, TDBlockTable> tdbMap;
     private TDConfig config;
 
-    public TDManager() {
-        this.config = new TDConfig();
-        this.tdmMap = new HashMap<>();
-        this.tdiMap = new HashMap<>();
+    public static TDManager obtain() {
+        if (null == instance) {
+            synchronized (TDManager.class) {
+                if (null == instance) {
+                    instance = new TDManager();
+                }
+            }
+        }
+        return instance;
     }
 
-    public TDManager(TDConfig config) {
-        this.config = config;
+    private TDManager() {
+        this.config = new TDConfig();
         this.tdmMap = new HashMap<>();
-        this.tdiMap = new HashMap<>();
+        this.tddMap = new HashMap<>();
+        this.tdbMap = new HashMap<>();
+    }
+
+    public void config(TDConfig config) {
+        this.config = config;
     }
 
     public void createMTable(String name) {
         tdmMap.put(name, new TDMemoryTable(name, config));
     }
 
-    public void createITable(String name) {
-        tdiMap.put(name, new TDDiskTable(name, config));
+    public void createDTable(String name) {
+        tddMap.put(name, new TDDiskTable(name, config));
+    }
+
+    public void createBTable(String name) {
+        tdbMap.put(name, new TDBlockTable(name, config));
     }
 
     public boolean containsMKey(String name, int key) {
         return tdmMap.get(name).containsKey(checkHashByKey(key), key);
     }
 
-    public boolean containsIKey(String name, int key) {
-        if (null == tdiMap.get(name)) {
-            tdiMap.put(name, new TDDiskTable(name, config));
+    public boolean containsDKey(String name, int key) {
+        if (null == tddMap.get(name)) {
+            tddMap.put(name, new TDDiskTable(name, config));
         }
-        return tdiMap.get(name).containsKey(checkHashByKey(key), key);
+        return tddMap.get(name).containsKey(checkHashByKey(key), key);
+    }
+
+    public boolean containsBKey(String name, int key) {
+        if (null == tdbMap.get(name)) {
+            tdbMap.put(name, new TDBlockTable(name, config));
+        }
+        return tdbMap.get(name).containsKey(checkHashByKey(key), key);
     }
 
     public Object getM(String name, Object key) {
         return tdmMap.get(name).get(checkHashByKey(key), key);
     }
 
-    public Object getI(String name, Object key) {
-        if (null == tdiMap.get(name)) {
-            tdiMap.put(name, new TDDiskTable(name, config));
+    public Object getD(String name, Object key) {
+        if (null == tddMap.get(name)) {
+            tddMap.put(name, new TDDiskTable(name, config));
         }
-        return tdiMap.get(name).get(checkHashByKey(key), key);
+        return tddMap.get(name).get(checkHashByKey(key), key);
+    }
+
+    public Object getB(String name, Object key) {
+        if (null == tdbMap.get(name)) {
+            tdbMap.put(name, new TDBlockTable(name, config));
+        }
+        return tdbMap.get(name).get(checkHashByKey(key), key);
     }
 
     public Object putM(String name, Object key, Object value) {
@@ -85,16 +118,20 @@ public class TDManager {
     }
 
     public Object putI(String name, Object key, Object value) {
-        if (null == tdiMap.get(name)) {
-            tdiMap.put(name, new TDDiskTable(name, config));
+        if (null == tddMap.get(name)) {
+            tddMap.put(name, new TDDiskTable(name, config));
         }
-        return tdiMap.get(name).put(checkHashByKey(key), key, value);
+        return tddMap.get(name).put(checkHashByKey(key), key, value);
+    }
+
+    public Object putD(String name, Object key, TroubleBlock block) {
+        if (null == tdbMap.get(name)) {
+            tdbMap.put(name, new TDBlockTable(name, config));
+        }
+        return tdbMap.get(name).put(checkHashByKey(key), key, block);
     }
 
     private static final int hash(Object key) {
-        if (key instanceof Integer) {
-            return (Integer) key;
-        }
         int h;
         return (h = key.hashCode()) ^ (h >>> 16);
     }
@@ -109,7 +146,11 @@ public class TDManager {
     private int checkHashByKey(Object key) {
         int hash;
         if (key instanceof Integer) {
-            hash = (Integer) key;
+            if ((Integer) key == 0) {
+                hash = Integer.MAX_VALUE;
+            } else {
+                hash = (Integer) key;
+            }
         } else {
             hash = hash(key);
             if (hash < 0) {

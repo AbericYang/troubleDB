@@ -27,6 +27,8 @@ package cn.aberic.trouble.db;
 import cn.aberic.trouble.db.core.TDConfig;
 import cn.aberic.trouble.db.core.TDManager;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * @author Aberic on 2018/10/15 21:50
  * @see ClassLoader#defineClass(byte[], int, int)
@@ -36,37 +38,50 @@ public class ThreadTest {
 
     static class A {
 
-        private TDManager manager;
-
         public A() {
             TDConfig config = new TDConfig()
                     .setTree(3, 100);
-            manager = new TDManager(config);
+            TDManager.obtain().config(config);
             // manager.createMTable("haha");
-            manager.createITable("index");
+            TDManager.obtain().createDTable("index");
         }
 
         public void start() {
             at.start();
             bt.start();
             ct.start();
+            try {
+                TimeUnit.SECONDS.sleep(5);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            dt.start();
         }
 
         private Thread at = new Thread(() -> {
             for (int i = 0; i < 50; i++) {
-                System.out.println("map.putI(0) -> " + i + " = " + manager.putI("index", 1, i));
-            }
-        });
-
-        private Thread ct = new Thread(() -> {
-            for (int i = 0; i < 50; i++) {
-                System.out.println("map.putI(2) -> " + i + " = " + manager.putI("index", 1, i));
+                TDManager.obtain().putI("index", i, i);
+//                System.out.println("map.putI(0) -> " + i + " = " + TDManager.obtain().putI("index", i, i));
             }
         });
 
         private Thread bt = new Thread(() -> {
-            for (int i = 0; i < 50; i++) {
-                System.out.println("map.getI(1) -> " + i + " = " + manager.getI("index", 1));
+            for (int i = 50; i < 100; i++) {
+                TDManager.obtain().putI("index", i, i);
+//                System.out.println("map.putI(2) -> " + i + " = " + TDManager.obtain().putI("index", i, i));
+            }
+        });
+
+        private Thread ct = new Thread(() -> {
+            for (int i = 100; i < 150; i++) {
+                TDManager.obtain().putI("index", i, i);
+//                System.out.println("map.putI(2) -> " + i + " = " + TDManager.obtain().putI("index", i, i));
+            }
+        });
+
+        private Thread dt = new Thread(() -> {
+            for (int i = 0; i < 150; i++) {
+                System.out.println("map.getD(1) -> " + i + " = " + TDManager.obtain().getD("index", i));
             }
         });
     }

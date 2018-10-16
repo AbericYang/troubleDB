@@ -24,8 +24,19 @@
 
 package cn.aberic.trouble.db.util;
 
+import cn.aberic.trouble.db.core.TDConfig;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
+import com.google.common.io.Files;
+import org.apache.commons.lang3.StringUtils;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.Deque;
 import java.util.LinkedList;
+
+import static cn.aberic.trouble.db.util.AbstractTreeMap.file;
 
 /**
  * B-tree的层对象。
@@ -57,8 +68,8 @@ abstract class Range<K, V> extends Pair {
      *
      * <p>顶级/虚结点范围对象为所有结点范围对象的祖宗，它没有任何实际数据可操作意义，
      * 它的存在就是为了方便构造，但当第一个参数被put的时候，就会将结点的各个范围进行切割，
-     * 直到切割数量达到({@code NodeRange#NODE_ARRAY_LENGTH} + 1)，即满足分裂条件。
-     * 当满足分裂条件后，{@code NodeRange}开始诞生一个子结点范围数组对象，并继续按照上述条件进行后续分割操作。
+     * 直到切割数量达到({@code MemoryRange#NODE_ARRAY_LENGTH} + 1)，即满足分裂条件。
+     * 当满足分裂条件后，{@code MemoryRange}开始诞生一个子结点范围数组对象，并继续按照上述条件进行后续分割操作。
      *
      * <p>持续分割会维持一个B-Tree的模型。
      */
@@ -249,6 +260,25 @@ abstract class Range<K, V> extends Pair {
         return null;
     }
 
+    V get(String name, TDConfig config, int unit, int storeHash, K key) {
+        Range.Position position = position(unit, storeHash, key, null);
+        File file = file(TDConfig.storageIndexFilePath(config.getDbPath(), name, position.unit, position.level,
+                position.rangeLevelDegree, position.rangeDegree, position.nodeDegree));
+        try {
+            String fileContent = Files.asCharSource(file, Charset.forName("UTF-8")).read();
+            if (StringUtils.isEmpty(fileContent)) {
+                file.delete();
+                return null;
+            } else {
+                return JSON.parseObject(fileContent, new TypeReference<V>() {});
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            file.delete();
+        }
+        return null;
+    }
+
     final Position position(int unit, int storeHash, K key, V value) {
         int m = calculateLevelNow(storeHash); // 当前结点范围对象所在B-Tree的层
         int v = calculateDegreeForOneLevelNow(storeHash, m); // 当前结点范围对象在整层度中的顺序位置
@@ -256,8 +286,9 @@ abstract class Range<K, V> extends Pair {
         int rangeV = v - ((v - 1) / treeMaxDegree) * treeMaxDegree;
         // 结点对象在结点范围对象中的度，此处即为存储行号
         int minV = (int) ((real - (v - 1) * Math.pow(treeMaxDegree, m)) / Math.pow(treeMaxDegree, m - 1));
-//            System.out.println("y = " + treeMaxDegree + " | m = " + m + " | n = " + treeMaxLevel + " | v = " + v +
-//                    " | rangeV = " + rangeV + " | minV = " + minV + " | key = " + key + " | real = " + real);
+//        System.out.println("unit = " + unit + " | storeHash = " + storeHash + " | y = " + treeMaxDegree + " | m = " + m +
+//                " | n = " + treeMaxLevel + " | v = " + v + " | rangeV = " + rangeV + " | minV = " + minV +
+//                " | key = " + key + " | real = " + real);
         return new Position(unit, m, v, rangeV, minV, value);
     }
 

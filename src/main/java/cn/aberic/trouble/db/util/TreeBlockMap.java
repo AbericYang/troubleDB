@@ -24,11 +24,13 @@
 
 package cn.aberic.trouble.db.util;
 
+import cn.aberic.trouble.db.block.TroubleBlock;
+import cn.aberic.trouble.db.block.TroubleTransaction;
+import cn.aberic.trouble.db.block.TroubleValueWrite;
 import cn.aberic.trouble.db.core.TDConfig;
+import cn.aberic.trouble.db.core.TDManager;
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.TypeReference;
 import com.google.common.io.Files;
-import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,41 +38,42 @@ import java.io.Serializable;
 import java.nio.charset.Charset;
 
 /**
- * @author Aberic on 2018/10/14 20:41
- * @see ClassLoader#defineClass(byte[], int, int)
+ * @author Aberic on 2018/10/16 10:33
+ * @version 1.0
+ * @see
  * @since 1.0
  */
-public class TreeDiskMap<K, V> extends AbstractTreeMap<K, V> implements Serializable {
+public class TreeBlockMap<K> extends AbstractTreeMap<K, TroubleBlock> implements Serializable {
 
-    private static final long serialVersionUID = 5666542770113713739L;
+    private static final long serialVersionUID = 8884164220134360560L;
 
     /** 当前结点范围对象的根对象，祖宗结点 */
-    private DiskRange<K, V> root;
+    private BlockRange<K> root;
 
-    TreeDiskMap(String name) {
-        root = new DiskRange<>(name);
+    TreeBlockMap(String name) {
+        root = new BlockRange<>(name);
     }
 
-    TreeDiskMap(String name, TDConfig config) {
-        root = new DiskRange<>(name, config);
+    TreeBlockMap(String name, TDConfig config) {
+        root = new BlockRange<>(name, config);
     }
 
     @Override
-    public Range<K, V> range() {
+    public Range<K, TroubleBlock> range() {
         return root;
     }
 
-    static class DiskRange<K, V> extends Range<K, V> {
+    static class BlockRange<K> extends Range<K, TroubleBlock> {
 
         private TDConfig config;
         private String name;
 
-        DiskRange(String name) {
+        BlockRange(String name) {
             super();
             init(name, new TDConfig());
         }
 
-        DiskRange(String name, TDConfig config) {
+        BlockRange(String name, TDConfig config) {
             super(config.getTreeMaxLevel(), config.getNodeArrayLength());
             init(name, config);
         }
@@ -99,7 +102,7 @@ public class TreeDiskMap<K, V> extends AbstractTreeMap<K, V> implements Serializ
          * @return {@inheritDoc}
          */
         @Override
-        V get(int unit, int storeHash, K key) {
+        TroubleBlock get(int unit, int storeHash, K key) {
             return get(name, config, unit, storeHash, key);
         }
 
@@ -108,10 +111,16 @@ public class TreeDiskMap<K, V> extends AbstractTreeMap<K, V> implements Serializ
          *
          * @return {@inheritDoc}
          */
+        @SuppressWarnings("unchecked")
         @Override
-        V put(int unit, int storeHash, K key, V value) {
+        TroubleBlock put(int unit, int storeHash, K key, TroubleBlock value) {
+            TDManager.obtain().createDTable(name);
+            // 将写集KV写入磁盘库
+            value.getBody().getTransactions().forEach(transaction ->
+                    ((TroubleTransaction) transaction).getRwSet().getWrites().forEach(write ->
+                            TDManager.obtain().putI(name, ((TroubleValueWrite) write).getKey(), ((TroubleValueWrite) write).getValue())));
             Position position = position(unit, storeHash, key, value);
-            String path = TDConfig.storageIndexFilePath(config.getDbPath(), name, position.unit, position.level,
+            String path = TDConfig.storageBlockFilePath(config.getDbPath(), name, position.unit, position.level,
                     position.rangeLevelDegree, position.rangeDegree, position.nodeDegree);
             // if (fileHashMap.get(path))
             File file = file(path);

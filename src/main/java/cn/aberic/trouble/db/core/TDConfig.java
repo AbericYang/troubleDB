@@ -67,7 +67,7 @@ public class TDConfig {
     public static final String storageIndexFilePath(String dbPath, String tableName, int unit, int level,
                                                     int rangeLevelDegree, int rangeDegree, int nodeDegree) {
         if (StringUtils.isEmpty(dbPath)) {
-            dbPath = TROUBLE_DB_FILE_DIR;
+            dbPath = TROUBLE_DB_FILE_DIR + "index/";
         }
         return String.format("%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s", dbPath, File.separator, tableName, File.separator,
                 TDB_INDEX_NAME, File.separator, unit, File.separator, level, File.separator, rangeLevelDegree,
@@ -75,13 +75,13 @@ public class TDConfig {
     }
 
     public static final String storageBlockFilePath(String dbPath, String tableName, int unit, int level,
-                                                    int rangeLevelDegree, int rangeDegree) {
+                                                    int rangeLevelDegree, int rangeDegree, int nodeDegree) {
         if (StringUtils.isEmpty(dbPath)) {
-            dbPath = TROUBLE_DB_FILE_DIR;
+            dbPath = TROUBLE_DB_FILE_DIR + "block/";
         }
-        return String.format("%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s", dbPath, File.separator, tableName, File.separator,
+        return String.format("%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s", dbPath, File.separator, tableName, File.separator,
                 TDB_INDEX_NAME, File.separator, unit, File.separator, level, File.separator, rangeLevelDegree,
-                File.separator, TDB_BLOCK_FILE_START, rangeDegree, TDB_BLOCK_FILE_END);
+                File.separator, TDB_BLOCK_FILE_START, rangeDegree, File.separator, nodeDegree, TDB_BLOCK_FILE_END);
     }
 
     public TDConfig setTree(int treeMaxLevel, int nodeArrayLength) {

@@ -104,9 +104,9 @@ public class Test {
         TDConfig config = new TDConfig()
                 .setTree(3, 100);
         long startTime, estimatedTime;
-        TDManager manager = new TDManager(config);
+        TDManager.obtain().config(config);
         // manager.createMTable("haha");
-        manager.createITable("index");
+        TDManager.obtain().createDTable("index");
         // HashMemoryMap<Integer, Integer> map = new HashMemoryMap<>(3, 100);
 //        HashIntegerMap<Integer> map = new HashIntegerMap<>();
 //        TreeMemoryMap<Integer> map = new TreeMemoryMap<>();
@@ -149,16 +149,16 @@ public class Test {
 // ====================================================================================================================================
 
         for (int i = 1; i <= 5000000; i *= 3) {
-            manager.putI("index", i, new TroubleBlock<>(new TroubleBlockHeader(), new TroubleBlockBody(new ArrayList())));
+            TDManager.obtain().putI("index", i, new TroubleBlock<>(new TroubleBlockHeader(), new TroubleBlockBody(new ArrayList())));
         }
         for (int i = 1; i <= 5000000; i *= 3) {
-            System.out.println("map.getI(" + i + ") = " + manager.getI("index", i) + " | map.containsKey(" + i + ") = " + manager.containsIKey("index", i));
+            System.out.println("map.getD(" + i + ") = " + TDManager.obtain().getD("index", i) + " | map.containsKey(" + i + ") = " + TDManager.obtain().containsDKey("index", i));
         }
         for (int i = 1; i <= 5000000; i *= 2) {
-            System.out.println("map.getI(" + i + ") = " + manager.getI("index", i) + " | map.containsKey(" + i + ") = " + manager.containsIKey("index", i));
+            System.out.println("map.getD(" + i + ") = " + TDManager.obtain().getD("index", i) + " | map.containsKey(" + i + ") = " + TDManager.obtain().containsDKey("index", i));
         }
 //        for (int i = 1; i <= 5000000; i *= 2) {
-//            System.out.println("map.getI(" + i + ") = " + manager.getI("index", i) + " | map.containsKey(" + i + ") = " + manager.containsIKey("index", i));
+//            System.out.println("map.getD(" + i + ") = " + manager.getD("index", i) + " | map.containsKey(" + i + ") = " + manager.containsDKey("index", i));
 //        }
 
 // ====================================================================================================================================
@@ -190,7 +190,7 @@ public class Test {
 //            if (i % 10000 == 0) {
 //                System.out.println("i = " + i + " 耗时 = " + (System.currentTimeMillis() - startTime));
 //            }
-//            manager.getI("index", i);
+//            manager.getD("index", i);
 //        }
 //        System.out.println("耗时 = " + (System.currentTimeMillis() - startTime));
 

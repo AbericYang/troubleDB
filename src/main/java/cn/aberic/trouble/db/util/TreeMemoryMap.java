@@ -59,26 +59,26 @@ public class TreeMemoryMap<K, V> extends AbstractTreeMap<K, V> implements Serial
     private static final long serialVersionUID = 8565247786674084606L;
 
     /** 当前结点范围对象的根对象，祖宗结点 */
-    private NodeRange<K, V> root;
+    private MemoryRange<K, V> root;
 
     /**
      * 指定范围对象中的所属子结点数组大小进行构造，构造中初始化一个顶级结点范围对象
      *
      * <p>顶级结点范围对象为所有结点范围对象的祖宗结点，
      * 它的存在就是为了方便构造，但当第一个参数被put的时候，就会将结点的各个范围进行传入赋值或切割，
-     * 直到切割数量达到{@code {@link NodeRange#nodeArrayLength } + 1}，即满足分裂条件。
-     * 当满足分裂条件后，{@code RangeTreeMap.NodeRange}开始诞生一个子结点范围数组对象，并继续按照上述条件进行后续分割操作。
+     * 直到切割数量达到{@code {@link MemoryRange#nodeArrayLength } + 1}，即满足分裂条件。
+     * 当满足分裂条件后，{@code RangeTreeMap.MemoryRange}开始诞生一个子结点范围数组对象，并继续按照上述条件进行后续分割操作。
      *
      * <p>初始化时结点所属范围起始位置默认0，结点所属范围终止位置默认无穷大
      *
      * <p>持续分割会维持一个B+Tree的模型。
      */
     TreeMemoryMap() {
-        root = new NodeRange<>();
+        root = new MemoryRange<>();
     }
 
     TreeMemoryMap(int treeMaxLevel, int nodeArrayLength) {
-        root = new NodeRange<>(treeMaxLevel, nodeArrayLength);
+        root = new MemoryRange<>(treeMaxLevel, nodeArrayLength);
     }
 
     /**
@@ -91,17 +91,17 @@ public class TreeMemoryMap<K, V> extends AbstractTreeMap<K, V> implements Serial
         return root;
     }
 
-    static class NodeRange<K, V> extends Range<K, V> {
+    static class MemoryRange<K, V> extends Range<K, V> {
 
-        NodeRange() {
+        MemoryRange() {
             super();
         }
 
-        NodeRange(int treeMaxLevel, int nodeArrayLength) {
+        MemoryRange(int treeMaxLevel, int nodeArrayLength) {
             super(treeMaxLevel, nodeArrayLength);
         }
 
-        NodeRange(int levelNow, int keyIndexInNode, int degreeForOneLevelNow, int treeMaxLevel, int nodeArrayLength) {
+        MemoryRange(int levelNow, int keyIndexInNode, int degreeForOneLevelNow, int treeMaxLevel, int nodeArrayLength) {
             super(levelNow, keyIndexInNode, degreeForOneLevelNow, treeMaxLevel, nodeArrayLength);
         }
 
@@ -112,16 +112,16 @@ public class TreeMemoryMap<K, V> extends AbstractTreeMap<K, V> implements Serial
          */
         @Override
         V putExec(Deque<Integer> vDeque, int real, K key, V value, int m, int v) {
-            NodeRange<K, V> p = this, c = this;
+            MemoryRange<K, V> p = this, c = this;
             int selfV;
             // System.out.println("p.start = " + p.start + " | p.end = " + p.end);
             while (null != vDeque.peek()) {
                 int temV = vDeque.pop();
                 selfV = (temV - 1) - ((temV - 1) / treeMaxDegree) * treeMaxDegree;
 //                System.out.println("temV out = " + temV + " | selfV out = " + selfV);
-                c = (NodeRange<K, V>) p.nodeChildrenRanges[selfV];
+                c = (MemoryRange<K, V>) p.nodeChildrenRanges[selfV];
                 if (null == c) {
-                    c = new NodeRange<>(p.levelNow - 1, 0, temV, treeMaxLevel, nodeArrayLength);
+                    c = new MemoryRange<>(p.levelNow - 1, 0, temV, treeMaxLevel, nodeArrayLength);
                     p.nodeChildrenRanges[selfV] = c;
                 }
                 p = c;
@@ -164,7 +164,7 @@ public class TreeMemoryMap<K, V> extends AbstractTreeMap<K, V> implements Serial
      *
      * @author Aberic on 2018/10/7 15:25
      * @version 1.0
-     * @see NodeRange
+     * @see MemoryRange
      * @since 1.0
      */
     static class Node<K, V> implements RangePair<K, V> {
