@@ -62,6 +62,8 @@ class TreeBlockMap<K> extends AbstractTreeMap<K, TroubleBlock> implements Serial
 
         private TDConfig config;
         private String name;
+        private static final String blockHashName = "_bhn";
+        private static final String txHashName = "_thn";
 
         BlockRange(String name) {
             super();
@@ -109,11 +111,13 @@ class TreeBlockMap<K> extends AbstractTreeMap<K, TroubleBlock> implements Serial
         @SuppressWarnings("unchecked")
         @Override
         TroubleBlock put(int unit, int storeHash, K key, TroubleBlock value) {
-            TDManager.obtain().createDTable(name);
-            // 将写集KV写入磁盘库
-            value.getBody().getTransactions().forEach(transaction ->
-                    ((TroubleTransaction) transaction).getRwSet().getWrites().forEach(write ->
-                            TDManager.obtain().putD(name, ((TroubleValueWrite) write).getKey(), ((TroubleValueWrite) write).getValue())));
+            value.getBody().getTransactions().forEach(transaction -> {
+                // 将交易hash与关联区块key写入磁盘库
+                TDManager.obtain().putD(String.format("%s%s", name, txHashName), ((TroubleTransaction) transaction).getTxHash(), key);
+                // 将写集KV写入磁盘库
+                ((TroubleTransaction) transaction).getRwSet().getWrites().forEach(write ->
+                        TDManager.obtain().putD(name, ((TroubleValueWrite) write).getKey(), ((TroubleValueWrite) write).getValue()));
+            });
             return putValue(name, config, unit, storeHash, key, value);
         }
 

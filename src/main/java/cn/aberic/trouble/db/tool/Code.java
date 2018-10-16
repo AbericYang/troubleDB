@@ -24,76 +24,9 @@
 
 package cn.aberic.trouble.db.tool;
 
-import java.util.Arrays;
-
 /**
- * 0                                -> q
- * 00                               -> we
- * 000                              -> er2
- * 0000                             -> rteo
- * 00000                            -> typp0
- * 000000                           -> yu8y5q
- * 0000000                          -> uiu8e3f
- * 00000000                         -> iosjld9v
- * 000000000                        -> opaue6cee
- * 0000000000                       -> padu8d3kcw
- * 00000000000                      -> asd83jnf1oq
- * 000000000000                     -> sd83n01lmnla
- * 0000000000000                    -> dflkmv023vwds
- * 00000000000000                   -> fgqoe9231lkcsd
- * 000000000000000                  -> ghniw20skjnqqpf
- * 0000000000000000                 -> hjbuq8oqkn23m91g
- * 00000000000000000                -> jknojhe019ufnd09h
- * 000000000000000000               -> klbnicjni289hf25jj
- * 0000000000000000000              -> lzerb149uninqa2pkdk
- * 00000000000000000000             -> zx2nfmwokom10mcaknll
- * 000000000000000000000            -> xcc81b2uhbd0nalnsqqdm
- * 0000000000000000000000           -> cvaokm012jenijncnalkng
- * 00000000000000000000000          -> vb7jsodnon10a3neolknmof
- * 000000000000000000000000         -> bnjshbdf9u29unfoknakjnkj
- * 0000000000000000000000000        -> nmeibqwkmdpmkpokna418h3ne
- * 00000000000000000000000000       -> mqqniehr6g2i3jn4oinmfojna1
- * 000000000000000000000000000      -> qwuhbw9829inlknmkn1onnl1n2j
- * 0000000000000000000000000000     -> wern83un4no2n09t5inse98dn1l1
- * 00000000000000000000000000000    -> ertn92n9funoanso1nd09noansknr
- * 000000000000000000000000000000   -> rtynd9un1infksnkjnekj2njinbijf
- * 0000000000000000000000000000000  -> tyucbb23eijrnfinin59nknakbkkabs
- * <p>
- * 1                                -> m
- * 11                               -> nb
- * 111                              -> bv2
- * 1111                             -> vceo
- * 11111                            -> cxpp0
- * 111111                           -> xz8y5q
- * 1111111                          -> zlu8e3f
- * 11111111                         -> lksjld9v
- * 111111111                        -> kjaue6cee
- * 1111111111                       -> jhdu8d3kcw
- * 11111111111                      -> hgd83jnf1oq
- * 111111111111                     -> gf83n01lmnla
- * 1111111111111                    -> fdlkmv023vwds
- * 11111111111111                   -> dsqoe9231lkcsd
- * 111111111111111                  -> saniw20skjnqqpf
- * 1111111111111111                 -> apbuq8oqkn23m91g
- * 11111111111111111                -> ponojhe019ufnd09h
- * 111111111111111111               -> oibnicjni289hf25jj
- * 1111111111111111111              -> iuerb149uninqa2pkdk
- * 11111111111111111111             -> uy2nfmwokom10mcaknll
- * 111111111111111111111            -> ytc81b2uhbd0nalnsqqdm
- * 1111111111111111111111           -> traokm012jenijncnalkng
- * 11111111111111111111111          -> re7jsodnon10a3neolknmof
- * 111111111111111111111111         -> ewjshbdf9u29unfoknakjnkj
- * 1111111111111111111111111        -> wqeibqwkmdpmkpokna418h3ne
- * 11111111111111111111111111       -> qmqniehr6g2i3jn4oinmfojna1
- * 111111111111111111111111111      -> mnuhbw9829inlknmkn1onnl1n2j
- * 1111111111111111111111111111     -> nbvn83un4no2n09t5inse98dn1l1
- * 11111111111111111111111111111    -> bvcn92n9funoanso1nd09noansknr
- * 111111111111111111111111111111   -> vcxnd9un1infksnkjnekj2njinbijf
- * 1111111111111111111111111111111  -> cxzcbb23eijrnfinin59nknakbkkabs
- *
  * @author Aberic on 2018/10/16 16:31
  * @version 1.0
- * @see
  * @since 1.0
  */
 public class Code {
@@ -102,20 +35,20 @@ public class Code {
         StringBuilder result = new StringBuilder();
         byte[] bytes = intToByte32(num);
         StringBuilder tmp = new StringBuilder();
-        boolean zero = false;
+        boolean zero = true;
         for (byte b : bytes) {
             if (b == 0x00) {
                 if (zero) {
                     tmp.append("0");
                 } else {
-                    result.append(tmp.toString());
+                    result.append(b1[tmp.toString().length() - 1]);
                     tmp.delete(0, tmp.length());
                     tmp.append("0");
                 }
                 zero = true;
             } else if (b == 0x01) {
                 if (zero) {
-                    result.append(tmp.toString());
+                    result.append(b0[tmp.toString().length() - 1]);
                     tmp.delete(0, tmp.length());
                     tmp.append("1");
                 } else {
@@ -124,17 +57,56 @@ public class Code {
                 zero = false;
             }
         }
-        result.append(tmp.toString());
-        return result.toString();
+        if (zero) {
+            result.append(b0[tmp.toString().length() - 1]);
+        } else {
+            result.append(b1[tmp.toString().length() - 1]);
+        }
+        return result.toString().replace("qz", "h").replace("mz", "o");
     }
 
     public static int hash2Int(String hash) {
         byte[] bytes = new byte[32];
-        char[] chars = hash.toCharArray();
+        char[] chars = hash2ByteString(hash).toCharArray();
         for (int i = 0; i < 32; i++) {
             bytes[i] = String.valueOf(chars[i]).equals("0") ? (byte) 0x00 : (byte) 0x01;
         }
         return byte32ToInt(bytes);
+    }
+
+    private static String hash2ByteString(String hash) {
+        hash = hash.replace("h", "qz").replace("o", "mz");
+        StringBuilder result = new StringBuilder();
+        String[] arr = hash.split("z");
+        for (String str : arr) {
+            switch (str) {
+                case "q":
+                    result.append("0");
+                    break;
+                case "w":
+                    result.append("00");
+                    break;
+                case "m":
+                    result.append("1");
+                    break;
+                case "n":
+                    result.append("11");
+                    break;
+                default:
+                    for (int i = 2; i < 32; i++) {
+                        if (str.length() == i) {
+                            if (str.substring(1, 2).equals("b")) {
+                                result.append(s0[i]);
+                            } else {
+                                result.append(s1[i]);
+                            }
+                            break;
+                        }
+                    }
+                    break;
+            }
+        }
+        return result.toString();
     }
 
 
@@ -143,6 +115,7 @@ public class Code {
      * 实际上每个8位byte只存储了一个0或1的数字
      *
      * @param num num
+     *
      * @return byte[]
      */
     private static byte[] intToByte32(int num) {
@@ -153,7 +126,6 @@ public class Code {
             // 右移一位.
             num >>= 1;
         }
-        System.out.println("arr = " + Arrays.toString(arr));
         return arr;
     }
 
@@ -162,6 +134,7 @@ public class Code {
      * 每一个8位byte都只存储了0或1的数字.
      *
      * @param arr arr
+     *
      * @return int
      */
     private static int byte32ToInt(byte[] arr) {
@@ -173,148 +146,6 @@ public class Code {
             sum |= (arr[i] << (31 - i));
         }
         return sum;
-    }
-
-    private static String hash2ByteString(String hash) {
-        return null;
-    }
-
-    private static String trans0(String transFrom) {
-        switch (transFrom) {
-            case s0_1:
-                return b0_1;
-            case s0_2:
-                return b0_2;
-            case s0_3:
-                return b0_3;
-            case s0_4:
-                return b0_4;
-            case s0_5:
-                return b0_5;
-            case s0_6:
-                return b0_6;
-            case s0_7:
-                return b0_7;
-            case s0_8:
-                return b0_8;
-            case s0_9:
-                return b0_9;
-            case s0_10:
-                return b0_10;
-            case s0_11:
-                return b0_11;
-            case s0_12:
-                return b0_12;
-            case s0_13:
-                return b0_13;
-            case s0_14:
-                return b0_14;
-            case s0_15:
-                return b0_15;
-            case s0_16:
-                return b0_16;
-            case s0_17:
-                return b0_17;
-            case s0_18:
-                return b0_18;
-            case s0_19:
-                return b0_19;
-            case s0_20:
-                return b0_20;
-            case s0_21:
-                return b0_21;
-            case s0_22:
-                return b0_22;
-            case s0_23:
-                return b0_23;
-            case s0_24:
-                return b0_24;
-            case s0_25:
-                return b0_25;
-            case s0_26:
-                return b0_26;
-            case s0_27:
-                return b0_27;
-            case s0_28:
-                return b0_28;
-            case s0_29:
-                return b0_29;
-            case s0_30:
-                return b0_30;
-            case s0_31:
-                return b0_31;
-            default:
-                return null;
-        }
-    }
-
-    private static String trans1(String transFrom) {
-        switch (transFrom) {
-            case s1_1:
-                return b1_1;
-            case s1_2:
-                return b1_2;
-            case s1_3:
-                return b1_3;
-            case s1_4:
-                return b1_4;
-            case s1_5:
-                return b1_5;
-            case s1_6:
-                return b1_6;
-            case s1_7:
-                return b1_7;
-            case s1_8:
-                return b1_8;
-            case s1_9:
-                return b1_9;
-            case s1_10:
-                return b1_10;
-            case s1_11:
-                return b1_11;
-            case s1_12:
-                return b1_12;
-            case s1_13:
-                return b1_13;
-            case s1_14:
-                return b1_14;
-            case s1_15:
-                return b1_15;
-            case s1_16:
-                return b1_16;
-            case s1_17:
-                return b1_17;
-            case s1_18:
-                return b1_18;
-            case s1_19:
-                return b1_19;
-            case s1_20:
-                return b1_20;
-            case s1_21:
-                return b1_21;
-            case s1_22:
-                return b1_22;
-            case s1_23:
-                return b1_23;
-            case s1_24:
-                return b1_24;
-            case s1_25:
-                return b1_25;
-            case s1_26:
-                return b1_26;
-            case s1_27:
-                return b1_27;
-            case s1_28:
-                return b1_28;
-            case s1_29:
-                return b1_29;
-            case s1_30:
-                return b1_30;
-            case s1_31:
-                return b1_31;
-            default:
-                return null;
-        }
     }
 
     private static final String s0_1 = "0";
@@ -381,68 +212,85 @@ public class Code {
     private static final String s1_30 = "111111111111111111111111111111";
     private static final String s1_31 = "1111111111111111111111111111111";
 
-    private static final String b0_1 = "q";
-    private static final String b0_2 = "we";
-    private static final String b0_3 = "er2";
-    private static final String b0_4 = "rteo";
-    private static final String b0_5 = "typp0";
-    private static final String b0_6 = "yu8y5q";
-    private static final String b0_7 = "uiu8e3f";
-    private static final String b0_8 = "iosjld9v";
-    private static final String b0_9 = "opaue6cee";
-    private static final String b0_10 = "padu8d3kcw";
-    private static final String b0_11 = "asd83jnf1oq";
-    private static final String b0_12 = "sd83n01lmnla";
-    private static final String b0_13 = "dflkmv023vwds";
-    private static final String b0_14 = "fgqoe9231lkcsd";
-    private static final String b0_15 = "ghniw20skjnqqpf";
-    private static final String b0_16 = "hjbuq8oqkn23m91g";
-    private static final String b0_17 = "jknojhe019ufnd09h";
-    private static final String b0_18 = "klbnicjni289hf25jj";
-    private static final String b0_19 = "lzerb149uninqa2pkdk";
-    private static final String b0_20 = "zx2nfmwokom10mcaknll";
-    private static final String b0_21 = "xcc81b2uhbd0nalnsqqdm";
-    private static final String b0_22 = "cvaokm012jenijncnalkng";
-    private static final String b0_23 = "vb7jsodnon10a3neolknmof";
-    private static final String b0_24 = "bnjshbdf9u29unfoknakjnkj";
-    private static final String b0_25 = "nmeibqwkmdpmkpokna418h3ne";
-    private static final String b0_26 = "mqqniehr6g2i3jn4oinmfojna1";
-    private static final String b0_27 = "qwuhbw9829inlknmkn1onnl1n2j";
-    private static final String b0_28 = "wern83un4no2n09t5inse98dn1l1";
-    private static final String b0_29 = "ertn92n9funoanso1nd09noansknr";
-    private static final String b0_30 = "rtynd9un1infksnkjnekj2njinbijf";
-    private static final String b0_31 = "tyucbb23eijrnfinin59nknakbkkabs";
+    private static final String b0_1 = "qz";
+    private static final String b0_2 = "wz";
+    private static final String b0_3 = "ebz";
+    private static final String b0_4 = "rbez";
+    private static final String b0_5 = "tbppz";
+    private static final String b0_6 = "yb8y5z";
+    private static final String b0_7 = "ubu8e3z";
+    private static final String b0_8 = "ibsjld9z";
+    private static final String b0_9 = "xbaue6cez";
+    private static final String b0_10 = "pbdu8d3kcz";
+    private static final String b0_11 = "abd83jnf1xz";
+    private static final String b0_12 = "sb83n01lmnlz";
+    private static final String b0_13 = "dblkmv023vwdz";
+    private static final String b0_14 = "fbqxe9231lkcsz";
+    private static final String b0_15 = "gbniw20skjnqqpz";
+    private static final String b0_16 = "ybbuq8xqkn23m91z";
+    private static final String b0_17 = "jbnxjye019ufnd09z";
+    private static final String b0_18 = "kbbnicjni289yf25jz";
+    private static final String b0_19 = "lberb149uninqa2pkdz";
+    private static final String b0_20 = "wb2nfmwxkxm10mcaknlz";
+    private static final String b0_21 = "xbc81b2uybd0nalnsqqdz";
+    private static final String b0_22 = "cbaxkm012jenijncnalknz";
+    private static final String b0_23 = "vb7jsxdnxn10a3nexlknmxz";
+    private static final String b0_24 = "bbjsybdf9u29unfxknakjnkz";
+    private static final String b0_25 = "nbeibqwkmdpmkpxkna418y3nz";
+    private static final String b0_26 = "mbqnieyr6g2i3jn4xinmfxjnaz";
+    private static final String b0_27 = "qbuybw9829inlknmkn1xnnl1n2z";
+    private static final String b0_28 = "wbrn83un4nx2n09t5inse98dn1lz";
+    private static final String b0_29 = "ebtn92n9funxansx1nd09nxansknz";
+    private static final String b0_30 = "rbynd9un1infksnkjnekj2njinbijz";
+    private static final String b0_31 = "tbucbb23eijrnfinin59nknakbkkabz";
 
-    private static final String b1_1 = "m";
-    private static final String b1_2 = "nb";
-    private static final String b1_3 = "bv2";
-    private static final String b1_4 = "vceo";
-    private static final String b1_5 = "cxpp0";
-    private static final String b1_6 = "xz8y5q";
-    private static final String b1_7 = "zlu8e3f";
-    private static final String b1_8 = "lksjld9v";
-    private static final String b1_9 = "kjaue6cee";
-    private static final String b1_10 = "jhdu8d3kcw";
-    private static final String b1_11 = "hgd83jnf1oq";
-    private static final String b1_12 = "gf83n01lmnla";
-    private static final String b1_13 = "fdlkmv023vwds";
-    private static final String b1_14 = "dsqoe9231lkcsd";
-    private static final String b1_15 = "saniw20skjnqqpf";
-    private static final String b1_16 = "apbuq8oqkn23m91g";
-    private static final String b1_17 = "ponojhe019ufnd09h";
-    private static final String b1_18 = "oibnicjni289hf25jj";
-    private static final String b1_19 = "iuerb149uninqa2pkdk";
-    private static final String b1_20 = "uy2nfmwokom10mcaknll";
-    private static final String b1_21 = "ytc81b2uhbd0nalnsqqdm";
-    private static final String b1_22 = "traokm012jenijncnalkng";
-    private static final String b1_23 = "re7jsodnon10a3neolknmof";
-    private static final String b1_24 = "ewjshbdf9u29unfoknakjnkj";
-    private static final String b1_25 = "wqeibqwkmdpmkpokna418h3ne";
-    private static final String b1_26 = "qmqniehr6g2i3jn4oinmfojna1";
-    private static final String b1_27 = "mnuhbw9829inlknmkn1onnl1n2j";
-    private static final String b1_28 = "nbvn83un4no2n09t5inse98dn1l1";
-    private static final String b1_29 = "bvcn92n9funoanso1nd09noansknr";
-    private static final String b1_30 = "vcxnd9un1infksnkjnekj2njinbijf";
-    private static final String b1_31 = "cxzcbb23eijrnfinin59nknakbkkabs";
+    private static final String b1_1 = "mz";
+    private static final String b1_2 = "nz";
+    private static final String b1_3 = "bcz";
+    private static final String b1_4 = "vcez";
+    private static final String b1_5 = "ccppz";
+    private static final String b1_6 = "xc8y5z";
+    private static final String b1_7 = "wcu8e3z";
+    private static final String b1_8 = "lcsjld9z";
+    private static final String b1_9 = "kcaue6cez";
+    private static final String b1_10 = "jcdu8d3kcz";
+    private static final String b1_11 = "ycd83jnf1xz";
+    private static final String b1_12 = "gc83n01lmnlz";
+    private static final String b1_13 = "fclkmv023vwdz";
+    private static final String b1_14 = "dcqxe9231lkcsz";
+    private static final String b1_15 = "scniw20skjnqqpz";
+    private static final String b1_16 = "acbuq8xqkn23m91z";
+    private static final String b1_17 = "pcnxjye019ufnd09z";
+    private static final String b1_18 = "xcbnicjni289yf25jz";
+    private static final String b1_19 = "icerb149uninqa2pkdz";
+    private static final String b1_20 = "uc2nfmwxkxm10mcaknlz";
+    private static final String b1_21 = "ycc81b2uybd0nalnsqqdz";
+    private static final String b1_22 = "tcaxkm012jenijncnalknz";
+    private static final String b1_23 = "rc7jsxdnxn10a3nexlknmxz";
+    private static final String b1_24 = "ecjsybdf9u29unfxknakjnkz";
+    private static final String b1_25 = "wceibqwkmdpmkpxkna418y3nz";
+    private static final String b1_26 = "qcqnieyr6g2i3jn4xinmfxjnaz";
+    private static final String b1_27 = "mcuybw9829inlknmkn1xnnl1n2z";
+    private static final String b1_28 = "ncvn83un4nx2n09t5inse98dn1lz";
+    private static final String b1_29 = "bccn92n9funxansx1nd09nxansknz";
+    private static final String b1_30 = "vcxnd9un1infksnkjnekj2njinbijz";
+    private static final String b1_31 = "ccwcbb23eijrnfinin59nknakbkkabz";
+
+    private static final String[] s0 = new String[]{
+            s0_1, s0_2, s0_3, s0_4, s0_5, s0_6, s0_7, s0_8, s0_9, s0_10, s0_11, s0_12, s0_13, s0_14, s0_15, s0_16, s0_17, s0_18, s0_19, s0_20, s0_21, s0_22, s0_23, s0_24, s0_25, s0_26, s0_27, s0_28, s0_29, s0_30, s0_31
+    };
+
+    private static final String[] s1 = new String[]{
+            s1_1, s1_2, s1_3, s1_4, s1_5, s1_6, s1_7, s1_8, s1_9, s1_10, s1_11, s1_12, s1_13, s1_14, s1_15, s1_16, s1_17, s1_18, s1_19, s1_20, s1_21, s1_22, s1_23, s1_24, s1_25, s1_26, s1_27, s1_28, s1_29, s1_30, s1_31
+    };
+
+    private static final String[] b0 = new String[]{
+            b0_1, b0_2, b0_3, b0_4, b0_5, b0_6, b0_7, b0_8, b0_9, b0_10, b0_11, b0_12, b0_13, b0_14, b0_15, b0_16, b0_17, b0_18, b0_19, b0_20, b0_21, b0_22, b0_23, b0_24, b0_25, b0_26, b0_27, b0_28, b0_29, b0_30, b0_31
+    };
+
+    private static final String[] b1 = new String[]{
+            b1_1, b1_2, b1_3, b1_4, b1_5, b1_6, b1_7, b1_8, b1_9, b1_10, b1_11, b1_12, b1_13, b1_14, b1_15, b1_16, b1_17, b1_18, b1_19, b1_20, b1_21, b1_22, b1_23, b1_24, b1_25, b1_26, b1_27, b1_28, b1_29, b1_30, b1_31
+    };
+
 
 }

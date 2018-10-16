@@ -24,6 +24,7 @@
 
 package cn.aberic.trouble.db.block;
 
+import cn.aberic.trouble.db.tool.Code;
 import com.alibaba.fastjson.annotation.JSONField;
 import org.apache.commons.lang3.time.DateFormatUtils;
 
@@ -65,10 +66,10 @@ public class TroubleBlockHeader {
     private String currentBlockHash;
     /** 上一区块hash */
     @JSONField(name = "p")
-    String previousBlockHash;
+    private String previousBlockHash;
     /** 当前区块生成时间戳 */
     @JSONField(name = "t")
-    long timestamp;
+    private long timestamp;
     /** 交易时间戳转字符串——yyyy/MM/dd HH:mm:ss，序列化时不写入 */
     @JSONField(serialize = false)
     private String time;
@@ -110,6 +111,47 @@ public class TroubleBlockHeader {
 
     public void setSmartContractVersion(String smartContractVersion) {
         this.smartContractVersion = smartContractVersion;
+    }
+
+    public String getSmartContractName() {
+        return smartContractName;
+    }
+
+    public String getSmartContractVersion() {
+        return smartContractVersion;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
+        this.currentBlockHash = Code.int2Hash(this.height);
+    }
+
+    public String getCurrentBlockHash() {
+        return currentBlockHash;
+    }
+
+    public void setCurrentBlockHash(String currentBlockHash) {
+        this.currentBlockHash = currentBlockHash;
+    }
+
+    public String getPreviousBlockHash() {
+        return previousBlockHash;
+    }
+
+    public void setPreviousBlockHash(String previousBlockHash) {
+        this.previousBlockHash = previousBlockHash;
+    }
+
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
     }
 
     public String getTime() {

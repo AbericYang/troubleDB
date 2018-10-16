@@ -59,4 +59,12 @@ public class TroubleValueWrite {
     public String getValue() {
         return value;
     }
+
+    public void setKey(String key) {
+        this.key = key;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
+    }
 }

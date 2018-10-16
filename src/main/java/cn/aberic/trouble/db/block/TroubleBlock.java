@@ -25,9 +25,6 @@
 package cn.aberic.trouble.db.block;
 
 import com.alibaba.fastjson.annotation.JSONField;
-import com.google.common.hash.Hashing;
-
-import java.nio.charset.Charset;
 
 /**
  * <p>区块对象
@@ -38,10 +35,10 @@ import java.nio.charset.Charset;
  * <p>在区块头中的当前区块hash由{@code TroubleBlock#calculateHash()}方法生成。
  *
  * @author Aberic on 2018/10/7 16:00
+ * @version 1.0
  * @see TroubleBlockHeader
  * @see TroubleBlockBody
  * @since 1.0
- * @version 1.0
  */
 public class TroubleBlock<H extends TroubleBlockHeader, B extends TroubleBlockBody> {
 
@@ -57,19 +54,20 @@ public class TroubleBlock<H extends TroubleBlockHeader, B extends TroubleBlockBo
         this.body = body;
     }
 
+    public void setHeader(H header) {
+        this.header = header;
+    }
+
+    public void setBody(B body) {
+        this.body = body;
+    }
+
     public H getHeader() {
         return header;
     }
 
     public B getBody() {
         return body;
-    }
-
-    /** 得到当前区块hash */
-    public String calculateHash() {
-        return Hashing.sha256().hashString(String.format("%s%s%s",
-                header.previousBlockHash, Long.toString(header.timestamp), body.bodyString()),
-                Charset.forName("UTF-8")).toString();
     }
 
 }

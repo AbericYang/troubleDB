@@ -155,6 +155,30 @@ public class TroubleTransaction<T extends TroubleValueRWSet> {
         return txHash;
     }
 
+    public void setContractName(String contractName) {
+        this.contractName = contractName;
+    }
+
+    public void setContractVersion(String contractVersion) {
+        this.contractVersion = contractVersion;
+    }
+
+    public void setCreator(String creator) {
+        this.creator = creator;
+    }
+
+    public void setTimestamp(Long timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    public void setTxHash(String txHash) {
+        this.txHash = txHash;
+    }
+
+    public int getTransactionStatusCode() {
+        return transactionStatusCode;
+    }
+
     public TroubleTransaction build() {
         txHash = Hashing.sha256().hashString(String.format("%s%s%s%s",
                 creator, JSON.toJSONString(rwSet), timestamp), Charset.forName("UTF-8")).toString();

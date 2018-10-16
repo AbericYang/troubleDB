@@ -27,6 +27,9 @@ package cn.aberic.trouble.db;
 import cn.aberic.trouble.db.core.TDConfig;
 import cn.aberic.trouble.db.core.TDManager;
 import cn.aberic.trouble.db.tool.Code;
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.Arrays;
 
 /**
  * @author Aberic on 2018/10/8 19:20
@@ -226,9 +229,8 @@ public class Test {
 //        System.out.println("7 / 4 = " + 7 / 4);
 //        System.out.println("9 / 4 = " + 9 / 4);
 
-        System.out.println("int hash 19860501 = " + Code.int2Hash(19860501));
-        System.out.println("hash int " + Code.int2Hash(19860501) + " = " + Code.hash2Int(Code.int2Hash(19860501)));
-
+        System.out.println("int hash 19860501 = " + Code.int2Hash(19630715));
+        System.out.println("hash int " + Code.int2Hash(19630715) + " = " + Code.hash2Int(Code.int2Hash(19630715)));
     }
 
     /**

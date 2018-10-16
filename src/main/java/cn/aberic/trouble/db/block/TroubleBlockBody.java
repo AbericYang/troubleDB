@@ -52,6 +52,10 @@ public class TroubleBlockBody<T extends TroubleTransaction> {
     @JSONField(name = "t")
     private List<T> transactions;
 
+    public TroubleBlockBody(List<T> transactions) {
+        this.transactions = transactions;
+    }
+
     public int getTxCount() {
         return null != transactions ? transactions.size() : 0;
     }
@@ -60,7 +64,11 @@ public class TroubleBlockBody<T extends TroubleTransaction> {
         return transactions;
     }
 
-    public TroubleBlockBody(List<T> transactions) {
+    public void setTxCount(int txCount) {
+        this.txCount = txCount;
+    }
+
+    public void setTransactions(List<T> transactions) {
         this.transactions = transactions;
     }
 
