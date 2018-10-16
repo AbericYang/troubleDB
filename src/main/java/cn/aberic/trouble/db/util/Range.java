@@ -260,7 +260,7 @@ abstract class Range<K, V> extends Pair {
         return null;
     }
 
-    V get(String name, TDConfig config, int unit, int storeHash, K key) {
+    V getValue(String name, TDConfig config, int unit, int storeHash, K key) {
         Range.Position position = position(unit, storeHash, key, null);
         File file = file(TDConfig.storageIndexFilePath(config.getDbPath(), name, position.unit, position.level,
                 position.rangeLevelDegree, position.rangeDegree, position.nodeDegree));
@@ -277,6 +277,21 @@ abstract class Range<K, V> extends Pair {
             file.delete();
         }
         return null;
+    }
+
+    V putValue(String name, TDConfig config, int unit, int storeHash, K key, V value) {
+        Position position = position(unit, storeHash, key, value);
+        String path = TDConfig.storageIndexFilePath(config.getDbPath(), name, position.unit, position.level,
+                position.rangeLevelDegree, position.rangeDegree, position.nodeDegree);
+        // if (fileHashMap.get(path))
+        File file = file(path);
+        try {
+            Files.asCharSink(file, Charset.forName("UTF-8")).write(JSON.toJSONString(position.value));
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+        return value;
     }
 
     final Position position(int unit, int storeHash, K key, V value) {

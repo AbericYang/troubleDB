@@ -29,13 +29,8 @@ import cn.aberic.trouble.db.block.TroubleTransaction;
 import cn.aberic.trouble.db.block.TroubleValueWrite;
 import cn.aberic.trouble.db.core.TDConfig;
 import cn.aberic.trouble.db.core.TDManager;
-import com.alibaba.fastjson.JSON;
-import com.google.common.io.Files;
 
-import java.io.File;
-import java.io.IOException;
 import java.io.Serializable;
-import java.nio.charset.Charset;
 
 /**
  * @author Aberic on 2018/10/16 10:33
@@ -103,7 +98,7 @@ public class TreeBlockMap<K> extends AbstractTreeMap<K, TroubleBlock> implements
          */
         @Override
         TroubleBlock get(int unit, int storeHash, K key) {
-            return get(name, config, unit, storeHash, key);
+            return getValue(name, config, unit, storeHash, key);
         }
 
         /**
@@ -119,18 +114,7 @@ public class TreeBlockMap<K> extends AbstractTreeMap<K, TroubleBlock> implements
             value.getBody().getTransactions().forEach(transaction ->
                     ((TroubleTransaction) transaction).getRwSet().getWrites().forEach(write ->
                             TDManager.obtain().putI(name, ((TroubleValueWrite) write).getKey(), ((TroubleValueWrite) write).getValue())));
-            Position position = position(unit, storeHash, key, value);
-            String path = TDConfig.storageBlockFilePath(config.getDbPath(), name, position.unit, position.level,
-                    position.rangeLevelDegree, position.rangeDegree, position.nodeDegree);
-            // if (fileHashMap.get(path))
-            File file = file(path);
-            try {
-                Files.asCharSink(file, Charset.forName("UTF-8")).write(JSON.toJSONString(position.value));
-            } catch (IOException e) {
-                e.printStackTrace();
-                return null;
-            }
-            return value;
+            return putValue(name, config, unit, storeHash, key, value);
         }
 
     }

@@ -33,7 +33,7 @@ import cn.aberic.trouble.db.util.HashBlockMap;
  * @see
  * @since 1.0
  */
-public class TDBlockTable {
+class TDBlockTable {
 
     private HashBlockMap<Object> map;
 

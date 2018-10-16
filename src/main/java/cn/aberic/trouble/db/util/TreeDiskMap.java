@@ -25,15 +25,8 @@
 package cn.aberic.trouble.db.util;
 
 import cn.aberic.trouble.db.core.TDConfig;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.TypeReference;
-import com.google.common.io.Files;
-import org.apache.commons.lang3.StringUtils;
 
-import java.io.File;
-import java.io.IOException;
 import java.io.Serializable;
-import java.nio.charset.Charset;
 
 /**
  * @author Aberic on 2018/10/14 20:41
@@ -100,7 +93,7 @@ public class TreeDiskMap<K, V> extends AbstractTreeMap<K, V> implements Serializ
          */
         @Override
         V get(int unit, int storeHash, K key) {
-            return get(name, config, unit, storeHash, key);
+            return getValue(name, config, unit, storeHash, key);
         }
 
         /**
@@ -110,18 +103,7 @@ public class TreeDiskMap<K, V> extends AbstractTreeMap<K, V> implements Serializ
          */
         @Override
         V put(int unit, int storeHash, K key, V value) {
-            Position position = position(unit, storeHash, key, value);
-            String path = TDConfig.storageIndexFilePath(config.getDbPath(), name, position.unit, position.level,
-                    position.rangeLevelDegree, position.rangeDegree, position.nodeDegree);
-            // if (fileHashMap.get(path))
-            File file = file(path);
-            try {
-                Files.asCharSink(file, Charset.forName("UTF-8")).write(JSON.toJSONString(position.value));
-            } catch (IOException e) {
-                e.printStackTrace();
-                return null;
-            }
-            return value;
+            return putValue(name, config, unit, storeHash, key, value);
         }
 
     }
