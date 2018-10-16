@@ -39,28 +39,28 @@ public class HashBlockMap<K> extends AbstractHashMap<K, TroubleBlock> implements
 
     private static final long serialVersionUID = -9214074875130191502L;
 
-    private TreeDiskMap<K, TroubleBlock> treeDiskMap;
+    private TreeBlockMap<K> treeBlockMap;
 
     public HashBlockMap(String name) {
-        treeDiskMap = new TreeDiskMap<>(name);
-        treeMaxLength = treeDiskMap.range().treeMaxLength;
+        treeBlockMap = new TreeBlockMap<>(name);
+        treeMaxLength = treeBlockMap.range().treeMaxLength;
     }
 
     public HashBlockMap(String name, TDConfig config) {
-        treeDiskMap = new TreeDiskMap<>(name, config);
-        treeMaxLength = treeDiskMap.range().treeMaxLength;
+        treeBlockMap = new TreeBlockMap<>(name, config);
+        treeMaxLength = treeBlockMap.range().treeMaxLength;
     }
 
     @Override
     public boolean containsKey(int hash, K key) {
         int unit = unit(hash);
-        return treeDiskMap.containsKey(unit, storeHash(hash, unit));
+        return treeBlockMap.containsKey(unit, storeHash(hash, unit));
     }
 
     @Override
     public TroubleBlock get(int hash, K key) {
         int unit = unit(hash);
-        return treeDiskMap.get(unit, storeHash(hash, unit), key);
+        return treeBlockMap.get(unit, storeHash(hash, unit), key);
     }
 
     @Override
@@ -69,6 +69,6 @@ public class HashBlockMap<K> extends AbstractHashMap<K, TroubleBlock> implements
             return null;
         }
         int unit = unit(hash);
-        return treeDiskMap.put(unit, storeHash(hash, unit), key, value);
+        return treeBlockMap.put(unit, storeHash(hash, unit), key, value);
     }
 }

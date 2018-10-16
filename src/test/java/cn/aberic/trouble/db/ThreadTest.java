@@ -60,22 +60,22 @@ public class ThreadTest {
 
         private Thread at = new Thread(() -> {
             for (int i = 0; i < 50; i++) {
-                TDManager.obtain().putI("index", i, i);
-//                System.out.println("map.putI(0) -> " + i + " = " + TDManager.obtain().putI("index", i, i));
+                TDManager.obtain().putD("index", i, i);
+//                System.out.println("map.putD(0) -> " + i + " = " + TDManager.obtain().putD("index", i, i));
             }
         });
 
         private Thread bt = new Thread(() -> {
             for (int i = 50; i < 100; i++) {
-                TDManager.obtain().putI("index", i, i);
-//                System.out.println("map.putI(2) -> " + i + " = " + TDManager.obtain().putI("index", i, i));
+                TDManager.obtain().putD("index", i, i);
+//                System.out.println("map.putD(2) -> " + i + " = " + TDManager.obtain().putD("index", i, i));
             }
         });
 
         private Thread ct = new Thread(() -> {
             for (int i = 100; i < 150; i++) {
-                TDManager.obtain().putI("index", i, i);
-//                System.out.println("map.putI(2) -> " + i + " = " + TDManager.obtain().putI("index", i, i));
+                TDManager.obtain().putD("index", i, i);
+//                System.out.println("map.putD(2) -> " + i + " = " + TDManager.obtain().putD("index", i, i));
             }
         });
 

@@ -33,7 +33,7 @@ import java.io.Serializable;
  * @see ClassLoader#defineClass(byte[], int, int)
  * @since 1.0
  */
-public class TreeDiskMap<K, V> extends AbstractTreeMap<K, V> implements Serializable {
+class TreeDiskMap<K, V> extends AbstractTreeMap<K, V> implements Serializable {
 
     private static final long serialVersionUID = 5666542770113713739L;
 

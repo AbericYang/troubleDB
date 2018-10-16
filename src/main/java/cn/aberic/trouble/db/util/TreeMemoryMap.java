@@ -54,7 +54,7 @@ import java.util.HashMap;
  * @see HashMemoryMap
  * @since 1.0
  */
-public class TreeMemoryMap<K, V> extends AbstractTreeMap<K, V> implements Serializable {
+class TreeMemoryMap<K, V> extends AbstractTreeMap<K, V> implements Serializable {
 
     private static final long serialVersionUID = 8565247786674084606L;
 

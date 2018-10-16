@@ -38,7 +38,7 @@ import java.io.Serializable;
  * @see
  * @since 1.0
  */
-public class TreeBlockMap<K> extends AbstractTreeMap<K, TroubleBlock> implements Serializable {
+class TreeBlockMap<K> extends AbstractTreeMap<K, TroubleBlock> implements Serializable {
 
     private static final long serialVersionUID = 8884164220134360560L;
 
@@ -113,7 +113,7 @@ public class TreeBlockMap<K> extends AbstractTreeMap<K, TroubleBlock> implements
             // 将写集KV写入磁盘库
             value.getBody().getTransactions().forEach(transaction ->
                     ((TroubleTransaction) transaction).getRwSet().getWrites().forEach(write ->
-                            TDManager.obtain().putI(name, ((TroubleValueWrite) write).getKey(), ((TroubleValueWrite) write).getValue())));
+                            TDManager.obtain().putD(name, ((TroubleValueWrite) write).getKey(), ((TroubleValueWrite) write).getValue())));
             return putValue(name, config, unit, storeHash, key, value);
         }
 

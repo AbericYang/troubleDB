@@ -31,7 +31,10 @@ import java.util.HashMap;
 /**
  * @author Aberic on 2018/10/12 14:38
  * @version 1.0
- * @see
+ * @see TDConfig
+ * @see TDMemoryTable
+ * @see TDDiskTable
+ * @see TDBlockTable
  * @since 1.0
  */
 public class TDManager {
@@ -117,14 +120,14 @@ public class TDManager {
         return tdmMap.get(name).put(checkHashByKey(key), key, value);
     }
 
-    public Object putI(String name, Object key, Object value) {
+    public Object putD(String name, Object key, Object value) {
         if (null == tddMap.get(name)) {
             tddMap.put(name, new TDDiskTable(name, config));
         }
         return tddMap.get(name).put(checkHashByKey(key), key, value);
     }
 
-    public Object putD(String name, Object key, TroubleBlock block) {
+    public Object putB(String name, Object key, TroubleBlock block) {
         if (null == tdbMap.get(name)) {
             tdbMap.put(name, new TDBlockTable(name, config));
         }
