@@ -27,16 +27,17 @@ package cn.aberic.trouble.db.core;
 import cn.aberic.trouble.db.util.HashDiskMap;
 
 /**
- * @author Aberic on 2018/10/14 20:48
- * @see ClassLoader#defineClass(byte[], int, int)
+ * @author Aberic on 2018/10/17 15:19
+ * @version 1.0
+ * @see
  * @since 1.0
  */
-class TDDiskTable {
+public class ConcurrentTDDiskTable {
 
     private HashDiskMap<Object, Object> map;
 
-    TDDiskTable(String name, TDConfig config) {
-        map = new HashDiskMap<>(name, config, false);
+    ConcurrentTDDiskTable(String name, TDConfig config) {
+        map = new HashDiskMap<>(name, config, true);
     }
 
     boolean containsKey(int hash, Object key) {

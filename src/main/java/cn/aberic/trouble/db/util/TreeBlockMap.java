@@ -62,7 +62,6 @@ class TreeBlockMap<K> extends AbstractTreeMap<K, TroubleBlock> implements Serial
 
         private TDConfig config;
         private String name;
-        private static final String blockHashName = "_bhn";
         private static final String txHashName = "_thn";
 
         BlockRange(String name) {

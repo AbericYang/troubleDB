@@ -24,11 +24,15 @@
 
 package cn.aberic.trouble.db;
 
+import cn.aberic.trouble.db.block.TroubleBlock;
+import cn.aberic.trouble.db.block.TroubleBlockBody;
+import cn.aberic.trouble.db.block.TroubleBlockHeader;
 import cn.aberic.trouble.db.core.TDConfig;
 import cn.aberic.trouble.db.core.TDManager;
 import cn.aberic.trouble.db.tool.Code;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
@@ -147,15 +151,15 @@ public class Test {
 
 // ====================================================================================================================================
 
-//        for (int i = 1; i <= 5000000; i *= 3) {
-//            TDManager.obtain().putD("index", i, new TroubleBlock<>(new TroubleBlockHeader(), new TroubleBlockBody(new ArrayList())));
-//        }
-//        for (int i = 1; i <= 5000000; i *= 3) {
-//            System.out.println("map.getD(" + i + ") = " + TDManager.obtain().getD("index", i) + " | map.containsKey(" + i + ") = " + TDManager.obtain().containsDKey("index", i));
-//        }
-//        for (int i = 1; i <= 5000000; i *= 2) {
-//            System.out.println("map.getD(" + i + ") = " + TDManager.obtain().getD("index", i) + " | map.containsKey(" + i + ") = " + TDManager.obtain().containsDKey("index", i));
-//        }
+        for (int i = 1; i <= 5000000; i *= 3) {
+            TDManager.obtain().putD("index", i, new TroubleBlock<>(new TroubleBlockHeader(), new TroubleBlockBody(new ArrayList())));
+        }
+        for (int i = 1; i <= 5000000; i *= 3) {
+            System.out.println("map.getD(" + i + ") = " + TDManager.obtain().getD("index", i) + " | map.containsKey(" + i + ") = " + TDManager.obtain().containsDKey("index", i));
+        }
+        for (int i = 1; i <= 5000000; i *= 2) {
+            System.out.println("map.getD(" + i + ") = " + TDManager.obtain().getD("index", i) + " | map.containsKey(" + i + ") = " + TDManager.obtain().containsDKey("index", i));
+        }
 //        for (int i = 1; i <= 5000000; i *= 2) {
 //            System.out.println("map.getD(" + i + ") = " + manager.getD("index", i) + " | map.containsKey(" + i + ") = " + manager.containsDKey("index", i));
 //        }
@@ -229,8 +233,12 @@ public class Test {
 //        System.out.println("7 / 4 = " + 7 / 4);
 //        System.out.println("9 / 4 = " + 9 / 4);
 
-        System.out.println("int hash 19860501 = " + Code.int2Hash(19630715));
-        System.out.println("hash int " + Code.int2Hash(19630715) + " = " + Code.hash2Int(Code.int2Hash(19630715)));
+
+// ====================================================================================================================================
+//        System.out.println("int hash 19860501 = " + Code.int2Hash(19630715));
+//        System.out.println("hash int " + Code.int2Hash(19630715) + " = " + Code.hash2Int(Code.int2Hash(19630715)));
+// ====================================================================================================================================
+
     }
 
     /**

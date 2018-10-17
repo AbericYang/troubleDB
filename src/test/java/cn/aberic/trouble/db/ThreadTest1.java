@@ -36,12 +36,12 @@ import java.util.concurrent.locks.ReentrantLock;
  * @see ClassLoader#defineClass(byte[], int, int)
  * @since 1.0
  */
-public class ThreadTest {
+public class ThreadTest1 {
 
     static class A {
 
         ReentrantLock lock = new ReentrantLock();
-        HashMap<Integer, Integer> map = new HashMap<>();
+        HashMap<Integer, HashMap<Integer, Integer>> iMap = new HashMap<>();
 
         public A() {
             TDConfig config = new TDConfig()
@@ -55,62 +55,45 @@ public class ThreadTest {
             at.start();
             bt.start();
             ct.start();
-            dt.start();
+//            dt.start();
+        }
+
+        public void put(int k, int index, int size, int num) {
+            try {
+                lock.lock();
+                while (null == iMap.get(k)) {
+                    iMap.put(k, new HashMap<>());
+                    System.out.println(Thread.currentThread().getName() + " 初始化");
+                }
+            } finally {
+                lock.unlock();
+            }
+
+            synchronized (iMap.get(k)) {
+                for (int i = index; i < size; i++) {
+                    iMap.get(k).put(i, i + num);
+//                TDManager.obtain().putD("index", i, i);
+//                System.out.println("map.putD(0) -> " + i + " = " + TDManager.obtain().putD("index", i, i));
+                    System.out.println("map.putD(" + Thread.currentThread().getName() + ") -> " + i + " <==> " + (i + num));
+                }
+            }
         }
 
         private Thread at = new Thread(() -> {
-            try {
-                lock.lock();
-                while (null == map.get(1)) {
-                    for (int i = 0; i < 50; i++) {
-                        map.put(i, i);
-//                TDManager.obtain().putD("index", i, i);
-//                System.out.println("map.putD(0) -> " + i + " = " + TDManager.obtain().putD("index", i, i));
-                        System.out.println("map.putD(at) -> " + i + " <==> " + i);
-                    }
-                }
-            } finally {
-                lock.unlock();
-            }
-        });
+            put(1, 0, 50, 0);
+        }, "at");
 
         private Thread bt = new Thread(() -> {
-            for (int i = 0; i < 50; i++) {
-                map.put(i, i + 1);
-//                TDManager.obtain().putD("index", i, i);
-//                System.out.println("map.putD(2) -> " + i + " = " + TDManager.obtain().putD("index", i, i));
-                System.out.println("map.putD(bt) -> " + i + " <==> " + (i + 1));
-            }
-        });
+            put(1, 0, 50, 1);
+        }, "bt");
 
         private Thread ct = new Thread(() -> {
-            try {
-                lock.lock();
-                while (null == map.get(1)) {
-                    for (int i = 0; i < 50; i++) {
-                        map.put(i, i + 2);
-//                TDManager.obtain().putD("index", i, i);
-//                System.out.println("map.putD(2) -> " + i + " = " + TDManager.obtain().putD("index", i, i));
-                        System.out.println("map.putD(ct) -> " + i + " <==> " + (i + 2));
-                    }
-                }
-            } finally {
-                lock.unlock();
-            }
-        });
+            put(2, 0, 50, 2);
+        }, "ct");
 
         private Thread dt = new Thread(() -> {
-            for (int i = 0; i < 50; i++) {
-                System.out.println("map.getD(dt) -> " + i + " = " + map.get(i));
-//                System.out.println("map.getD(1) -> " + i + " = " + TDManager.obtain().getD("index", i));
-
-                try {
-                    TimeUnit.MILLISECONDS.sleep(100);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
+            put(1, 0, 50, 3);
+        }, "dt");
     }
 
     public static void main(String[] args) {

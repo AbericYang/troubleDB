@@ -22,33 +22,34 @@
  * SOFTWARE.
  */
 
-package cn.aberic.trouble.db.core;
-
-import cn.aberic.trouble.db.util.HashDiskMap;
+package cn.aberic.trouble.db;
 
 /**
- * @author Aberic on 2018/10/14 20:48
- * @see ClassLoader#defineClass(byte[], int, int)
+ * @author Aberic on 2018/10/17 11:26
+ * @version 1.0
+ * @see
  * @since 1.0
  */
-class TDDiskTable {
+public class Try {
 
-    private HashDiskMap<Object, Object> map;
+    public static void main(String[] args) {
+        tryTest();
 
-    TDDiskTable(String name, TDConfig config) {
-        map = new HashDiskMap<>(name, config, false);
     }
 
-    boolean containsKey(int hash, Object key) {
-        return map.containsKey(hash, key);
-    }
+    private static int tryTest() {
+        int[] i = new int[]{1,2,3,4};
 
-    Object get(int hash, Object key) {
-        return map.get(hash, key);
-    }
-
-    Object put(int hash, Object key, Object value) {
-        return map.put(hash, key, value);
+        try {
+            i[5] = 1;
+            System.out.println("try");
+            return i[5];
+        } catch (Exception e) {
+            System.out.println("catch");
+            return 0;
+        } finally {
+            System.out.println("finally");
+        }
     }
 
 }

@@ -39,13 +39,13 @@ public class HashDiskMap<K, V> extends AbstractHashMap<K, V> implements Serializ
 
     private TreeDiskMap<K, V> treeDiskMap;
 
-    public HashDiskMap(String name) {
-        treeDiskMap = new TreeDiskMap<>(name);
+    public HashDiskMap(String name, boolean concurrent) {
+        treeDiskMap = new TreeDiskMap<>(name, concurrent);
         treeMaxLength = treeDiskMap.range().treeMaxLength;
     }
 
-    public HashDiskMap(String name, TDConfig config) {
-        treeDiskMap = new TreeDiskMap<>(name, config);
+    public HashDiskMap(String name, TDConfig config, boolean concurrent) {
+        treeDiskMap = new TreeDiskMap<>(name, config, concurrent);
         treeMaxLength = treeDiskMap.range().treeMaxLength;
     }
 

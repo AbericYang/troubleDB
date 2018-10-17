@@ -27,6 +27,7 @@ package cn.aberic.trouble.db.core;
 import cn.aberic.trouble.db.block.TroubleBlock;
 
 import java.util.HashMap;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author Aberic on 2018/10/12 14:38
@@ -44,7 +45,9 @@ public class TDManager {
     private HashMap<String, TDMemoryTable> tdmMap;
     private HashMap<String, TDDiskTable> tddMap;
     private HashMap<String, TDBlockTable> tdbMap;
+    private HashMap<String, ConcurrentTDDiskTable> ctddMap;
     private TDConfig config;
+    private ReentrantLock lock = new ReentrantLock();
 
     public static TDManager obtain() {
         if (null == instance) {
@@ -62,6 +65,7 @@ public class TDManager {
         this.tdmMap = new HashMap<>();
         this.tddMap = new HashMap<>();
         this.tdbMap = new HashMap<>();
+        this.ctddMap = new HashMap<>();
     }
 
     public void config(TDConfig config) {
@@ -69,15 +73,47 @@ public class TDManager {
     }
 
     public void createMTable(String name) {
-        tdmMap.put(name, new TDMemoryTable(name, config));
+        try {
+            lock.lock();
+            while (null == tdmMap.get(name)) {
+                tdmMap.put(name, new TDMemoryTable(name, config));
+            }
+        } finally {
+            lock.unlock();
+        }
     }
 
     public void createDTable(String name) {
-        tddMap.put(name, new TDDiskTable(name, config));
+        try {
+            lock.lock();
+            while (null == tddMap.get(name)) {
+                tddMap.put(name, new TDDiskTable(name, config));
+            }
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public void createCDTable(String name) {
+        try {
+            lock.lock();
+            while (null == ctddMap.get(name)) {
+                ctddMap.put(name, new ConcurrentTDDiskTable(name, config));
+            }
+        } finally {
+            lock.unlock();
+        }
     }
 
     public void createBTable(String name) {
-        tdbMap.put(name, new TDBlockTable(name, config));
+        try {
+            lock.lock();
+            while (null == tdbMap.get(name)) {
+                tdbMap.put(name, new TDBlockTable(name, config));
+            }
+        } finally {
+            lock.unlock();
+        }
     }
 
     public boolean containsMKey(String name, int key) {
@@ -86,14 +122,21 @@ public class TDManager {
 
     public boolean containsDKey(String name, int key) {
         if (null == tddMap.get(name)) {
-            tddMap.put(name, new TDDiskTable(name, config));
+            createDTable(name);
         }
         return tddMap.get(name).containsKey(checkHashByKey(key), key);
     }
 
+    public boolean containsCDKey(String name, int key) {
+        if (null == ctddMap.get(name)) {
+            createCDTable(name);
+        }
+        return ctddMap.get(name).containsKey(checkHashByKey(key), key);
+    }
+
     public boolean containsBKey(String name, int key) {
         if (null == tdbMap.get(name)) {
-            tdbMap.put(name, new TDBlockTable(name, config));
+            createBTable(name);
         }
         return tdbMap.get(name).containsKey(checkHashByKey(key), key);
     }
@@ -104,14 +147,21 @@ public class TDManager {
 
     public Object getD(String name, Object key) {
         if (null == tddMap.get(name)) {
-            tddMap.put(name, new TDDiskTable(name, config));
+            createDTable(name);
         }
         return tddMap.get(name).get(checkHashByKey(key), key);
     }
 
+    public Object getCD(String name, Object key) {
+        if (null == ctddMap.get(name)) {
+            createCDTable(name);
+        }
+        return ctddMap.get(name).get(checkHashByKey(key), key);
+    }
+
     public Object getB(String name, Object key) {
         if (null == tdbMap.get(name)) {
-            tdbMap.put(name, new TDBlockTable(name, config));
+            createBTable(name);
         }
         return tdbMap.get(name).get(checkHashByKey(key), key);
     }
@@ -122,14 +172,21 @@ public class TDManager {
 
     public Object putD(String name, Object key, Object value) {
         if (null == tddMap.get(name)) {
-            tddMap.put(name, new TDDiskTable(name, config));
+            createDTable(name);
         }
         return tddMap.get(name).put(checkHashByKey(key), key, value);
     }
 
+    public Object putCD(String name, Object key, Object value) {
+        if (null == ctddMap.get(name)) {
+            createCDTable(name);
+        }
+        return ctddMap.get(name).put(checkHashByKey(key), key, value);
+    }
+
     public Object putB(String name, Object key, TroubleBlock block) {
         if (null == tdbMap.get(name)) {
-            tdbMap.put(name, new TDBlockTable(name, config));
+            createBTable(name);
         }
         return tdbMap.get(name).put(checkHashByKey(key), key, block);
     }

@@ -34,9 +34,10 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.LinkedList;
-
-import static cn.aberic.trouble.db.util.AbstractTreeMap.file;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * B-tree的层对象。
@@ -111,6 +112,8 @@ abstract class Range<K, V> extends Pair {
         // real = (1 + z)(y^(m - 1)) + (v - 1)(y^m)
         firstNodeNum = (1 + keyIndexInNode) * yPowM1 + (degreeForOneLevelNow - 1) * (int) Math.pow(treeMaxDegree, this.levelNow);
 //            System.out.println("firstNodeNum = " + firstNodeNum);
+        Thread storageThread = new Thread(new StorageThread());
+        storageThread.start();
     }
 
     /**
@@ -262,7 +265,7 @@ abstract class Range<K, V> extends Pair {
 
     V getValue(String name, TDConfig config, int unit, int storeHash, K key) {
         Range.Position position = position(unit, storeHash, key, null);
-        File file = file(TDConfig.storageIndexFilePath(config.getDbPath(), name, position.unit, position.level,
+        File file = Storage.file(TDConfig.storageIndexFilePath(config.getDbPath(), name, position.unit, position.level,
                 position.rangeLevelDegree, position.rangeDegree, position.nodeDegree));
         try {
             String fileContent = Files.asCharSource(file, Charset.forName("UTF-8")).read();
@@ -279,12 +282,14 @@ abstract class Range<K, V> extends Pair {
         return null;
     }
 
+    private ReentrantLock lock = new ReentrantLock();
+    private HashMap<String, Storage<V>> map = new HashMap<>();
+
     V putValue(String name, TDConfig config, int unit, int storeHash, K key, V value) {
         Position position = position(unit, storeHash, key, value);
         String path = TDConfig.storageIndexFilePath(config.getDbPath(), name, position.unit, position.level,
                 position.rangeLevelDegree, position.rangeDegree, position.nodeDegree);
-        // if (fileHashMap.get(path))
-        File file = file(path);
+        File file = Storage.file(path);
         try {
             Files.asCharSink(file, Charset.forName("UTF-8")).write(JSON.toJSONString(position.value));
         } catch (IOException e) {
@@ -292,6 +297,23 @@ abstract class Range<K, V> extends Pair {
             return null;
         }
         return value;
+    }
+
+    V putValueSync(String name, TDConfig config, int unit, int storeHash, K key, V value) {
+        Position position = position(unit, storeHash, key, value);
+        String path = TDConfig.storageIndexFilePath(config.getDbPath(), name, position.unit, position.level,
+                position.rangeLevelDegree, position.rangeDegree, position.nodeDegree);
+        try {
+            lock.lock();
+            while (null == map.get(path)) {
+                map.put(path, new Storage<>(path));
+            }
+        } finally {
+            lock.unlock();
+        }
+        synchronized (map.get(path)) {
+            return map.get(path).write(value);
+        }
     }
 
     final Position position(int unit, int storeHash, K key, V value) {
@@ -305,6 +327,43 @@ abstract class Range<K, V> extends Pair {
 //                " | n = " + treeMaxLevel + " | v = " + v + " | rangeV = " + rangeV + " | minV = " + minV +
 //                " | key = " + key + " | real = " + real);
         return new Position(unit, m, v, rangeV, minV, value);
+    }
+
+    class StorageThread implements Runnable {
+
+        boolean mapCan = false;
+
+        @Override
+        public void run() {
+            while (null != map) {
+                try {
+                    lock.lock();
+                    mapCan = map.size() > 0;
+                    while (mapCan) {
+                        for (java.util.Map.Entry<String, Storage<V>> entry : map.entrySet()) {
+                            if (entry.getValue().out()) {
+                                if (Thread.currentThread().isInterrupted()) {
+                                    break;
+                                }
+                                map.remove(entry.getKey());
+                            }
+                        }
+                        mapCan = false;
+                    }
+                } finally {
+                    lock.unlock();
+                }
+                if (Thread.currentThread().isInterrupted()) {
+                    break;
+                }
+                try {
+                    TimeUnit.MINUTES.sleep(5);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
     }
 
     class Position {

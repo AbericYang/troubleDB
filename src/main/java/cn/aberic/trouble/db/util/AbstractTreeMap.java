@@ -24,8 +24,6 @@
 
 package cn.aberic.trouble.db.util;
 
-import com.google.common.io.Files;
-
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -100,26 +98,6 @@ public abstract class AbstractTreeMap<K, V> implements Map<K, V> {
      * @return 此映射中包含的映射关系的Range视图
      */
     public abstract Range<K, V> range();
-
-    /**
-     * 获取一个文件对象，如果没有，则创建出来并获取
-     *
-     * @param filePath 文件完整路径及文件名
-     *
-     * @return 创建的文件
-     */
-    static final File file(String filePath) {
-        File file = new File(filePath);
-        if (!file.exists()) {
-            try {
-                Files.createParentDirs(file); // 创建新文件的父目录
-                file.createNewFile(); // 创建新文件
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        return file;
-    }
 
     static final boolean fileExist(String filePath) {
         File file = new File(filePath);

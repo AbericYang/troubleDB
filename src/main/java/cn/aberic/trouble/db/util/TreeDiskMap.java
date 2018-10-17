@@ -40,12 +40,12 @@ class TreeDiskMap<K, V> extends AbstractTreeMap<K, V> implements Serializable {
     /** 当前结点范围对象的根对象，祖宗结点 */
     private DiskRange<K, V> root;
 
-    TreeDiskMap(String name) {
-        root = new DiskRange<>(name);
+    TreeDiskMap(String name, boolean concurrent) {
+        root = new DiskRange<>(name, concurrent);
     }
 
-    TreeDiskMap(String name, TDConfig config) {
-        root = new DiskRange<>(name, config);
+    TreeDiskMap(String name, TDConfig config, boolean concurrent) {
+        root = new DiskRange<>(name, config, concurrent);
     }
 
     @Override
@@ -57,14 +57,17 @@ class TreeDiskMap<K, V> extends AbstractTreeMap<K, V> implements Serializable {
 
         private TDConfig config;
         private String name;
+        private boolean concurrent;
 
-        DiskRange(String name) {
+        DiskRange(String name, boolean concurrent) {
             super();
+            this.concurrent = concurrent;
             init(name, new TDConfig());
         }
 
-        DiskRange(String name, TDConfig config) {
+        DiskRange(String name, TDConfig config, boolean concurrent) {
             super(config.getTreeMaxLevel(), config.getNodeArrayLength());
+            this.concurrent = concurrent;
             init(name, config);
         }
 
@@ -103,6 +106,9 @@ class TreeDiskMap<K, V> extends AbstractTreeMap<K, V> implements Serializable {
          */
         @Override
         V put(int unit, int storeHash, K key, V value) {
+            if (concurrent) {
+                return putValueSync(name, config, unit, storeHash, key, value);
+            }
             return putValue(name, config, unit, storeHash, key, value);
         }
 
