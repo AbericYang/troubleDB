@@ -32,11 +32,11 @@ import cn.aberic.trouble.db.util.HashDiskMap;
  * @see
  * @since 1.0
  */
-public class ConcurrentTDDiskTable {
+public class TDConcurrentDiskTable {
 
     private HashDiskMap<Object, Object> map;
 
-    ConcurrentTDDiskTable(String name, TDConfig config) {
+    TDConcurrentDiskTable(String name, TDConfig config) {
         map = new HashDiskMap<>(name, config, true);
     }
 

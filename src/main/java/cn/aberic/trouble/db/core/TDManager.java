@@ -45,7 +45,7 @@ public class TDManager {
     private HashMap<String, TDMemoryTable> tdmMap;
     private HashMap<String, TDDiskTable> tddMap;
     private HashMap<String, TDBlockTable> tdbMap;
-    private HashMap<String, ConcurrentTDDiskTable> ctddMap;
+    private HashMap<String, TDConcurrentDiskTable> ctddMap;
     private TDConfig config;
     private ReentrantLock lock = new ReentrantLock();
 
@@ -98,7 +98,7 @@ public class TDManager {
         try {
             lock.lock();
             while (null == ctddMap.get(name)) {
-                ctddMap.put(name, new ConcurrentTDDiskTable(name, config));
+                ctddMap.put(name, new TDConcurrentDiskTable(name, config));
             }
         } finally {
             lock.unlock();
